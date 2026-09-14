@@ -107,9 +107,34 @@ Toute dérogation à A1–A7 exige un ADR.
 
 ## 8. Workflow Git
 
+### Topologie des branches
+
+```
+main          ← états validés uniquement (promotion depuis pre)
+ ▲
+pre           ← BRANCHE D'INTÉGRATION : toutes les sessions y convergent
+ ▲
+ ├── feature/<domaine>-<sujet>     ← une session = une branche
+ ├── security/<sujet>
+ ├── docs/<sujet>
+ └── fix/<sujet>
+```
+
+- **`pre` est la branche centrale d'intégration.** Toute session part de `pre` à jour
+  (`git fetch origin && git checkout -b feature/<sujet> origin/pre`) et ouvre sa PR **vers `pre`**,
+  jamais vers `main`.
+- `main` ne reçoit que des promotions depuis `pre`, une fois l'ensemble cohérent et testé.
+- Avant d'ouvrir une PR : **re-synchroniser depuis `pre`** (`git merge origin/pre`) et résoudre les
+  conflits chez soi, pas dans la PR.
+
+### Règles
+
 - Branche par unité de travail : `feature/<domaine>-<sujet>`, `security/<sujet>`, `docs/<sujet>`, `fix/<sujet>`.
 - **Un chat = une mission = une branche.** Deux sessions ne modifient pas les mêmes fichiers en parallèle : séquencer ou coordonner explicitement.
-- `main` protégée : PR obligatoire, CI verte, au moins une revue, pas de force-push.
+- **Avant de commencer, vérifier ce que font les autres sessions** : `git fetch origin --prune` puis
+  `git branch -r`, et lire les PR ouvertes. Une décision déjà prise ailleurs ne se refait pas (§31.14
+  du cahier des charges : Git conserve, les chats réfléchissent).
+- `main` et `pre` protégées : PR obligatoire, CI verte, au moins une revue, pas de force-push.
 - Commits **atomiques et explicites** (Conventional Commits : `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`, `security:`).
 - Avant toute tâche importante : `git status` + `git diff`. Après : tests, `git diff`, commit.
 - **Ne jamais écraser le travail d'une autre branche/session.**
