@@ -35,7 +35,16 @@ par un agent doit respecter cette limite (voir `docs/product/02-contraintes-juri
 
 ## 2. État du projet
 
-**Phase 1 — POC UX/UI local.** Pas de backend. Pas de compte distant. Données locales ou fictives.
+**Phase 0 — structure du projet : terminée.** Règles permanentes, architecture, threat model,
+classification des données, ADR-0001 à ADR-0011. Aucun code applicatif.
+
+**Phase 1 — POC UX/UI en PWA : c'est la phase en cours.** Application web progressive, installable,
+fonctionnelle hors ligne. Pas de backend, pas de compte distant, données locales ou fictives.
+Décision : [ADR-0011](docs/decisions/0011-pwa-poc-phase-1.md).
+
+Le POC est une **version d'évaluation** : il annonce à chaque démarrage qu'il ne faut pas y déposer
+de vrais documents. Cette mention est une condition de l'ADR-0011, pas une précaution de style.
+
 Ce qui ne doit **pas** encore être développé est listé par phase dans `docs/product/03-roadmap.md`.
 
 ---
@@ -59,7 +68,12 @@ Toute dérogation à A1–A7 exige un ADR.
 ## 4. Conventions de code
 
 - **Langage** : TypeScript `strict` (pas de `any` implicite, pas de `@ts-ignore` sans commentaire justifiant).
-- **Mobile** : React Native + Expo (dev build), `expo-router` pour la navigation. Voir ADR-0002.
+- **Application (Phase 1)** : PWA — React + Vite, installable, hors ligne par service worker.
+  Voir [ADR-0011](docs/decisions/0011-pwa-poc-phase-1.md). L'application native React Native + Expo
+  reste la cible des phases 3+ ([ADR-0002](docs/decisions/0002-react-native-expo.md)).
+- **`packages/core` n'importe aucune API navigateur** (`window`, `document`, `indexedDB`, `crypto`
+  global) ni React : il doit rester exécutable par un futur backend et par l'application native.
+  Règle vérifiée par ESLint, pas par la discipline.
 - **Nommage** : code, identifiants, commentaires, commits, ADR **en anglais** ; textes UI et documentation produit **en français** (l'i18n passe par des clés, jamais de chaîne en dur dans un composant).
 - **Structure par feature**, pas par type technique :
   `features/<domain>/{ui,domain,data}` — `domain/` ne dépend d'aucun framework.
@@ -72,13 +86,21 @@ Toute dérogation à A1–A7 exige un ADR.
 ## 5. Règles de sécurité (obligatoires)
 
 1. **Jamais de secret dans Git.** Ni clé, ni token, ni `.env` rempli. Seulement `.env.example` avec des valeurs vides.
-2. **Jamais de clé de chiffrement en clair dans le code, les préférences, ou AsyncStorage.** Les clés vivent dans le Keychain/Keystore matériel (voir ADR-0003).
+2. **Jamais de clé de chiffrement en clair, nulle part.** En Phase 1 (PWA) : la KEK est dérivée du
+   code applicatif par Argon2id, tenue en mémoire comme `CryptoKey` non extractible, et **jamais
+   écrite** dans IndexedDB, OPFS, `localStorage` ou `sessionStorage`. À partir de la Phase 3 : dans
+   le Keychain/Keystore matériel. Voir [ADR-0003](docs/decisions/0003-local-first-chiffrement.md).
 3. **Chiffrement au repos** : documents et base métier chiffrés (chiffrement enveloppe, AES-256-GCM, DEK par document).
-4. **Exclusion des sauvegardes OS** pour le matériel de clé (`NSFileProtectionComplete` / `allowBackup=false` sur les conteneurs sensibles).
-5. **Validation d'entrée systématique** aux frontières : fichier importé, contenu OCR, réponse réseau, deep link.
-6. **Prompt injection** : tout contenu de document passé à un modèle IA est traité comme **donnée non fiable**, jamais comme instruction (voir `docs/architecture/05-ia-locale.md` §Sécurité IA).
-7. **Aucune fonctionnalité de sécurité « maison »** : pas de crypto artisanale, pas de protocole d'authentification inventé. Primitives standard et bibliothèques auditées uniquement.
-8. **Toute PR touchant crypto, clés, permissions, personne de confiance ou export = revue sécurité obligatoire** et mise à jour du threat model si le périmètre change.
+4. **Protection du matériel de clé contre les sauvegardes** : en Phase 1, la garantie vient de ce que
+   la KEK n'est jamais persistée ; à partir de la Phase 3, exclusion des sauvegardes OS
+   (`NSFileProtectionComplete` / `allowBackup=false` sur les conteneurs sensibles).
+5. **Phase 1, spécifique au web** : CSP stricte (ni `unsafe-inline`, ni `eval`), **aucune dépendance
+   servie par un CDN tiers**, SRI sur tout asset externe, service worker revu comme du code sensible.
+   Un XSS sur l'origine donne l'usage de la clé (voir `docs/security/01-threat-model.md`, R25).
+6. **Validation d'entrée systématique** aux frontières : fichier importé, contenu OCR, réponse réseau, deep link.
+7. **Prompt injection** : tout contenu de document passé à un modèle IA est traité comme **donnée non fiable**, jamais comme instruction (voir `docs/architecture/05-ia-locale.md` §Sécurité IA).
+8. **Aucune fonctionnalité de sécurité « maison »** : pas de crypto artisanale, pas de protocole d'authentification inventé. Primitives standard et bibliothèques auditées uniquement.
+9. **Toute PR touchant crypto, clés, permissions, personne de confiance ou export = revue sécurité obligatoire** et mise à jour du threat model si le périmètre change.
 
 ---
 
@@ -185,7 +207,8 @@ Une tâche est terminée **uniquement** lorsque :
 |---------|-------------------|-------------|
 | Architecture | ADR, data flow, trust boundaries, choix techniques, dette | Développer des fonctionnalités utilisateur |
 | UX/UI | Design system, écrans, parcours | Modifier le `domain/` ou la crypto |
-| Mobile | Application, navigation, état | Changer les contrats de ports sans ADR |
+| Web (Phase 1) | PWA `apps/web` : application, navigation, état, service worker | Changer les contrats de ports sans ADR |
+| Mobile (Phase 3+) | Application native, navigation, état | Changer les contrats de ports sans ADR |
 | Documents | Import, stockage, chiffrement des pièces | Toucher au moteur de legs |
 | Legs | Rédaction guidée, validation, versions | Toucher à l'IA |
 | Trusted Person | Désignation, droits, activation | Toucher au stockage documentaire |
