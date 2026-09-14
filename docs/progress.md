@@ -1,7 +1,7 @@
 # Current Progress
 
 > Mis à jour à chaque tâche significative. **Aucune donnée personnelle, aucun secret ici.**
-> Dernière mise à jour : 2026-09-14 — session *Architecture*.
+> Dernière mise à jour : 2026-09-14 — session *QA*.
 
 ## Completed
 
@@ -15,6 +15,19 @@
   - `docs/security/` : threat model initial, contrôles par frontière de confiance.
   - `docs/privacy/` : classification des données, export / portabilité / suppression (format VEA).
   - `docs/decisions/` : ADR-0001 à ADR-0010 + template.
+
+- **Socle qualité — partie agnostique du choix de stack** (session *QA*)
+  - `.github/pull_request_template.md` : checklist DoD (AGENTS.md §11) + points bloquants
+    (`docs/architecture/07-devsecops.md` §9.4).
+  - `.github/workflows/security-secrets.yml` : Gitleaks épinglé par version et vérifié par SHA-256,
+    historique complet, sorties masquées (`--redact`).
+  - `.github/workflows/docs.yml` + `tools/check-doc-links.py` : vérification des liens relatifs de la
+    documentation (48 liens, 0 cassé à ce commit).
+  - `.github/dependabot.yml` (GitHub Actions uniquement — aucun manifeste de paquet à ce stade),
+    `.gitignore`, `.editorconfig`.
+  - **Non fait, à faire côté GitHub par le porteur** : protection de `main` (PR obligatoire, 1 revue,
+    CI verte, pas de force-push), secret scanning + push protection, CODEOWNERS (nécessite les
+    identifiants GitHub réels).
 
 ## In Progress
 
@@ -59,3 +72,12 @@ confiance, qualification du responsable de traitement en Phase 1.
   (ADR-0005, options A/B/C) — **revue par un cryptographe externe requise avant implémentation**.
 - Les hypothèses juridiques (H1, H2) ne sont pas validées par un professionnel.
 - Aucun test utilisateur n'a encore été mené : le produit reste une hypothèse.
+- **Conflit de documentation signalé par la session QA (AGENTS.md §0)** : `AGENTS.md` §2 annonce
+  « Phase 1 — POC UX/UI local » alors que `README.md` et le présent fichier indiquent la Phase 0
+  terminée et le développement bloqué. AGENTS.md primant sur `progress.md`, un agent qui applique
+  l'ordre de priorité conclut qu'il peut coder. À arbitrer par la session *Architecture*.
+- **Piste « POC en PWA » évoquée hors documentation** : elle contredit frontalement ADR-0002
+  (§Alternatives, option 4 : « Solution web/PWA — écartée ») et ADR-0003 §Decision 3 et 6 (KEK dans
+  le secure element, fonction refusée à défaut). Tant qu'un ADR ne tranche pas, ADR-0002 fait foi :
+  aucune session ne doit démarrer un POC web (AGENTS.md §10, « Contredire un ADR sans le mettre à
+  jour »). À instruire par la session *Architecture*.
