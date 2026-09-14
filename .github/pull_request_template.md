@@ -41,7 +41,7 @@ non cochée doit être justifiée en clair, pas silencieusement ignorée.
 
 - [ ] Cette PR ne touche **ni** crypto, **ni** clés, **ni** permissions, **ni** contact de
       confiance, **ni** export/suppression.
-- [ ] Sinon : revue sécurité demandée (AGENTS.md §5.8), et threat model / classification
+- [ ] Sinon : revue sécurité demandée (AGENTS.md §5.9), et threat model / classification
       des données mis à jour si le périmètre change.
 
 ## Invariants (AGENTS.md §3)

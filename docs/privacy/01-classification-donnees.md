@@ -13,7 +13,7 @@
 | Donnée | Classe | Justification (finalité) | Stockage | Chiffrement | Rétention |
 |--------|--------|--------------------------|----------|-------------|-----------|
 | Prénom / nom d'usage | C2 | Personnalisation, remplissage du document | Appareil | Base chiffrée | Jusqu'à suppression |
-| Code applicatif | C4 | Authentification locale | Secure element (dérivé, jamais en clair) | Hash Argon2id + sel | Jusqu'à suppression |
+| Code applicatif | C4 | Authentification locale | Phase 1 : **jamais stocké** (sert à dériver la KEK à chaque déverrouillage) · Phase 3 : secure element | Dérivation Argon2id + sel | Jusqu'à suppression |
 | Préférences / accessibilité | C1 | UX | Appareil | Base chiffrée | Idem |
 | Consentements (objet, date, version du texte, révocation) | C1 | **Preuve de conformité** | Appareil (+ serveur en Phase 3) | Chiffré | 3 ans après révocation ⚖️ |
 | Email / téléphone (Phase 3) | C2 | Compte, contre-notification d'activation | Serveur | Chiffré applicativement | Durée du compte + 30 j |
@@ -66,6 +66,8 @@ le gabarit ne quitte jamais le secure element), contenu des documents côté ser
 
 ## 14.2 Chiffrement — schéma de clés
 
+**Cible (Phase 3+)**
+
 ```
 Code utilisateur ──Argon2id──┐
                              ├──► déverrouille la KEK (dans Secure Enclave/StrongBox, non exportable)
@@ -77,10 +79,25 @@ Biométrie (OS) ──────────────┘            │
 Clé de récupération (hors appareil, affichée une fois) ──Argon2id──► KEK de secours
 ```
 
+**Phase 1 — PWA** ([ADR-0003](../decisions/0003-local-first-chiffrement.md) §Variante Phase 1)
+
+```
+Code utilisateur ──Argon2id (WASM)──► KEK  (CryptoKey non extractible, EN MÉMOIRE SEULEMENT,
+                                      │     jamais écrite dans IndexedDB/OPFS/localStorage)
+                                      ├──► déchiffre DEK_meta    ──► métadonnées (IndexedDB)
+                                      └──► déchiffre DEK_doc_i   ──► fichier i (OPFS, AES-256-GCM)
+
+Pas de secure element · pas de biométrie · pas de clé de récupération (Phase 2)
+Verrouillage ou rechargement ⇒ la KEK disparaît, le code doit être ressaisi
+```
+
 Propriétés recherchées :
 - Une DEK par document ⇒ **partage sélectif** possible (paquet successoral) et **suppression
-  cryptographique** unitaire.
-- La KEK ne sort jamais du matériel ⇒ un vol de fichiers sans l'appareil est inexploitable.
+  cryptographique** unitaire. Vrai dans les deux variantes.
+- Phase 3 : la KEK ne sort jamais du matériel ⇒ un vol de fichiers sans l'appareil est inexploitable.
+- Phase 1 : la KEK n'est **jamais écrite** ⇒ une copie du profil navigateur ne contient que du
+  chiffré, mais la résistance ne tient plus qu'au code applicatif et au coût Argon2id. Limite
+  assumée, affichée à l'utilisateur, et bornée par l'interdiction d'y déposer de vrais documents.
 - Le serveur ne détient aucune clé (ADR-0010).
 - Rotation : changement de code ⇒ ré-encapsulage des DEK uniquement (pas de re-chiffrement des contenus).
 
@@ -98,6 +115,7 @@ et le choix doit être fait en Phase 2, avec revue externe.
 | Suppression d'une version de legs | Refusée par défaut (historique exigé) ; suppression totale du document possible |
 | Suppression du compte | Tout supprimé localement ; blobs serveur effacés ; audit conservé sous forme **anonymisée** (identifiant rompu) ⚖️ |
 | Désinstallation | Les données locales disparaissent ; **avertir l'utilisateur** de faire un export au préalable |
+| **Phase 1 — effacement des données de site par le navigateur** | Même effet qu'une désinstallation, mais **sans action de l'utilisateur** (R26) : persistance demandée, état affiché, export encouragé |
 | Révocation d'un contact | Ses droits sont détruits, le paquet est re-scellé, notification envoyée |
 | Activation réalisée | Accès du contact expirant automatiquement ; données conservées selon la volonté exprimée ⚖️ |
 

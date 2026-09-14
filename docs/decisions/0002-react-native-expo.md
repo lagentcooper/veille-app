@@ -1,15 +1,22 @@
 # ADR-0002 — React Native + Expo (dev build) et TypeScript strict
 
-- **Statut** : Accepté (à confirmer selon les compétences réelles de l'équipe)
-- **Date** : 2026-09-14
-- **Phase concernée** : 1 à 6
+- **Statut** : Accepté pour les phases 3 à 6 — **amendé pour la Phase 1 par
+  [ADR-0011](0011-pwa-poc-phase-1.md)** (le POC est une PWA)
+- **Date** : 2026-09-14 · amendé le 2026-09-14
+- **Phase concernée** : 3 à 6
+
+> **Amendement (ADR-0011).** Le POC de Phase 1 est une PWA, pas une application React Native.
+> L'analyse ci-dessous reste valable **pour le produit en production** : les limites du web qu'elle
+> identifie (pas de secure element, pas d'IA on-device sérieuse, pas de garanties de stockage) sont
+> réelles, et c'est pourquoi le web n'est retenu que pour le POC, avec une promesse de sécurité
+> explicitement réduite. La partie durable — `packages/core` en TypeScript pur — est commune aux deux
+> et ne change pas. Le choix pour la Phase 3 sera reconfirmé à la fin de la Phase 1.
 
 ## Context
 
-L'application doit être mobile (iOS + Android), très soignée sur l'UX, itérée rapidement en Phase 1
-avec de vrais utilisateurs, puis capable en Phase 3 d'accéder à des fonctions natives sensibles :
-Keychain/Keystore matériel, base chiffrée (SQLCipher), OCR de l'OS, exécution d'un LLM on-device.
-L'équipe est réduite et le budget contraint.
+L'application de production doit être mobile (iOS + Android), très soignée sur l'UX, et capable
+d'accéder à des fonctions natives sensibles : Keychain/Keystore matériel, base chiffrée (SQLCipher),
+OCR de l'OS, exécution d'un LLM on-device. L'équipe est réduite et le budget contraint.
 
 ## Decision
 
@@ -23,13 +30,18 @@ au framework.
 2. **Natif Swift + Kotlin** — accès optimal aux API de sécurité et d'IA, meilleure intégration OS.
 3. **Expo Go / React Native sans modules natifs** — le plus simple, mais incompatible avec les
    exigences cryptographiques et d'IA.
-4. **Solution web/PWA** — écartée : pas de secure element, pas d'IA on-device sérieuse, pas de
-   garanties de stockage.
+4. **Solution web/PWA** — écartée **pour la production** : pas de secure element, pas d'IA on-device
+   sérieuse, pas de garanties de stockage. Retenue en revanche **pour le seul POC de Phase 1**
+   ([ADR-0011](0011-pwa-poc-phase-1.md)), où aucune de ces trois exigences ne s'applique : les
+   testeurs n'y déposent pas de vrais documents, l'IA est un mock, et la perte de données d'un POC
+   n'a pas de conséquence.
 
 ## Why
 
-- **Vitesse d'itération UI** : la Phase 1 est une phase de design ; React Native permet de refaire un
-  parcours en quelques heures.
+- **Vitesse d'itération UI** : React Native permet de refaire un parcours en quelques heures.
+  ⚠️ Cet argument portait à l'origine sur la Phase 1 ; il ne la concerne plus (ADR-0011), la
+  validation du design se faisant sur la PWA. Il reste valable pour l'itération continue du produit
+  natif à partir de la Phase 3.
 - **Compétences disponibles** : l'écosystème TypeScript est le plus répandu, et il est partagé avec
   le futur backend (schémas Zod, types, règles métier réutilisables).
 - **Dev build** : contrairement à Expo Go, il autorise les modules natifs nécessaires
@@ -57,6 +69,8 @@ au framework.
 
 ## Revisit when
 
+- **Fin de la Phase 1** : le présent ADR redevient applicable. Le reconfirmer ou le remplacer à la
+  lumière des tests utilisateurs et de l'expérience acquise sur la PWA (ADR-0011 §Revisit when).
 - L'équipe recrutée est majoritairement Flutter/Dart ou natif.
 - L'inférence on-device se révèle impossible à intégrer proprement en React Native.
 - Une exigence de sécurité (attestation matérielle avancée, anti-tampering fort) impose du natif.

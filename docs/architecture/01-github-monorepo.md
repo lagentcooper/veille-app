@@ -28,9 +28,12 @@ un repo **privé séparé pour les secrets d'infrastructure et les runbooks sens
 
 ## 3.2 Arborescence exacte (cible)
 
-> ⚠️ En Phase 1, **seuls** `AGENTS.md`, `README.md`, `docs/`, `.github/`, `apps/mobile/` et
+> ⚠️ En Phase 1, **seuls** `AGENTS.md`, `README.md`, `docs/`, `.github/`, `apps/web/` et
 > `packages/{core,ui}` existent. Le reste est créé quand il devient nécessaire — ne pas créer de
 > dossiers vides « pour plus tard ».
+>
+> Le livrable de Phase 1 est la **PWA** `apps/web` ([ADR-0011](../decisions/0011-pwa-poc-phase-1.md)).
+> `apps/mobile` arrive en Phase 3 ([ADR-0002](../decisions/0002-react-native-expo.md)).
 
 ```
 veille/
@@ -55,18 +58,23 @@ veille/
 │   ├── ISSUE_TEMPLATE/
 │   ├── dependabot.yml
 │   └── workflows/
-│       ├── ci-mobile.yml         # lint + typecheck + tests + build (paths: apps/mobile, packages/**)
+│       ├── ci-web.yml            # lint + typecheck + tests + build (paths: apps/web, packages/**)
 │       ├── ci-packages.yml
+│       ├── docs.yml              # liens relatifs de la documentation
 │       ├── security-sast.yml     # CodeQL + Semgrep
 │       ├── security-secrets.yml  # Gitleaks (push protection GitHub en complément)
 │       ├── security-deps.yml     # audit + SBOM (Syft) + Grype
-│       ├── e2e-mobile.yml        # Maestro (nightly)
-│       └── release-mobile.yml    # EAS build/submit (Phase 3+)
+│       ├── e2e-web.yml           # Playwright (nightly)
+│       ├── ci-mobile.yml         # ⛔ Phase 3
+│       └── release-mobile.yml    # ⛔ EAS build/submit (Phase 3+)
 │
 ├── apps/
-│   ├── mobile/                   # Application React Native / Expo — SEUL livrable Phase 1
-│   │   ├── app/                  # expo-router : routes = écrans
+│   ├── web/                      # PWA React + Vite — SEUL livrable Phase 1
+│   │   ├── public/
+│   │   │   ├── manifest.webmanifest
+│   │   │   └── icons/
 │   │   ├── src/
+│   │   │   ├── routes/           # react-router : routes = écrans
 │   │   │   ├── features/         # Découpage par domaine métier
 │   │   │   │   ├── onboarding/
 │   │   │   │   ├── profile/
@@ -75,15 +83,15 @@ veille/
 │   │   │   │   ├── assistant/    # IA locale
 │   │   │   │   ├── trusted-contact/
 │   │   │   │   └── data-control/ # Export / import / suppression
-│   │   │   ├── infra/            # Adapters concrets des ports (sqlite, keystore, fs, mock AI)
-│   │   │   ├── navigation/
+│   │   │   ├── infra/            # Adapters des ports (IndexedDB, OPFS, WebCrypto, mock AI)
+│   │   │   ├── sw/               # Service worker — CODE SENSIBLE, revue obligatoire
 │   │   │   ├── theme/
 │   │   │   └── i18n/
-│   │   ├── assets/
-│   │   ├── e2e/                  # Maestro flows
-│   │   ├── app.json / eas.json
+│   │   ├── e2e/                  # Playwright
+│   │   ├── vite.config.ts
 │   │   └── package.json
 │   │
+│   ├── mobile/                   # ⛔ Phase 3 — React Native / Expo (ADR-0002)
 │   ├── api/                      # ⛔ Phase 3 — backend (Node/NestJS ou Go)
 │   └── admin/                    # ⛔ Phase 4 — back-office de revue des activations
 │
@@ -124,8 +132,10 @@ veille/
   permissions doivent être testables en millisecondes et réutilisables par un futur backend ou
   back-office. C'est la pièce la plus durable du projet.
 - `packages/ai` isolé : changer de modèle IA ne doit toucher aucun écran (ADR-0004).
-- `apps/mobile/src/infra` : tous les adapters concrets au même endroit → l'audit sécurité sait
-  exactement où regarder (clés, fichiers, base, réseau).
+- `apps/web/src/infra` : tous les adapters concrets au même endroit → l'audit sécurité sait
+  exactement où regarder (clés, fichiers, base, réseau). Même règle pour `apps/mobile` en Phase 3.
+- `apps/web/src/sw` isolé : le service worker est du code privilégié (il intercepte toutes les
+  requêtes de l'origine). Le sortir du reste rend sa revue obligatoire et évidente.
 - `.github/workflows` séparés par domaine avec filtres de chemins : une PR de documentation ne
   déclenche pas un build mobile de 20 minutes.
 
@@ -138,7 +148,7 @@ veille/
 | Branche `main` protégée | PR obligatoire, 1 revue minimum, CI verte, pas de force-push, pas de suppression, historique linéaire |
 | Secret scanning + **push protection** | Activé au niveau du repo (bloque le push d'un secret détecté) |
 | Dependabot | Alertes + PR de mise à jour hebdomadaires groupées |
-| CODEOWNERS | `packages/core/src/crypto/`, `packages/core/src/trusted-contact/`, `infra/`, `.github/workflows/` → revue sécurité obligatoire |
+| CODEOWNERS | `packages/core/src/crypto/`, `packages/core/src/trusted-contact/`, `apps/web/src/sw/`, `apps/web/src/infra/`, `infra/`, `.github/workflows/` → revue sécurité obligatoire |
 | Environnements GitHub | `staging` et `production` avec *required reviewers* et secrets scopés (Phase 3) |
 | Actions | Épinglées par SHA, `permissions:` minimales par workflow, pas de `pull_request_target` |
 | Tags signés | Releases signées, SBOM attachée à chaque release |

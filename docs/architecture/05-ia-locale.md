@@ -60,7 +60,14 @@ Règles :
 
 ---
 
-## 7.3 Cible on-device
+Le POC de Phase 1 étant une PWA ([ADR-0011](../decisions/0011-pwa-poc-phase-1.md)), `MockAIProvider`
+est le **seul** provider de cette phase : aucun modèle, aucun OCR, aucun index vectoriel réels. Cela
+ne coûte rien à la Phase 1, qui valide l'UX de l'assistant et non la qualité d'un modèle — c'était
+déjà la décision d'ADR-0004. La cible ci-dessous suppose l'application native de la Phase 3.
+
+---
+
+## 7.3 Cible on-device (Phase 3+)
 
 | Brique | Rôle | Option recommandée | Alternative | Risque |
 |--------|------|--------------------|-------------|--------|
