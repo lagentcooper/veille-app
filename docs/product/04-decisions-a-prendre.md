@@ -73,3 +73,4 @@ Les décisions marquées 🔴 sont **bloquantes** pour la Phase 1.
 | [0009](../decisions/0009-observabilite-sans-pii.md) | Observabilité sans PII, télémétrie opt-in |
 | [0010](../decisions/0010-hebergement-ue-e2ee.md) | Hébergement UE et zero-knowledge côté serveur |
 | [0011](../decisions/0011-pwa-poc-phase-1.md) | **PWA pour le POC de Phase 1** ; amende ADR-0002 (portée réduite aux phases 3+) et ADR-0003 (variante navigateur) |
+| [0012](../decisions/0012-github-pages-poc.md) | **GitHub Pages pour distribuer le POC** ; amende ADR-0011 (hébergement hors UE, pas d'en-têtes HTTP) |

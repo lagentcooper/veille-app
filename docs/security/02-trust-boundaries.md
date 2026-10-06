@@ -12,16 +12,23 @@ en silence.
 
 ## TB-0 — Navigateur et origine web (Phase 1 uniquement)
 
-Risques associés : R25 à R28 du threat model.
+Risques associés : R25 à R30 du threat model.
+
+> ⚠️ **Contrainte d'hébergement.** Le POC est publié sur **GitHub Pages**
+> ([ADR-0012](../decisions/0012-github-pages-poc.md)), qui **ne permet aucun en-tête HTTP
+> personnalisé**. Trois contrôles ci-dessous en sont dégradés, et il ne faut pas les supposer acquis :
+> la CSP est posée en `<meta>`, l'anti-cadrage n'est plus assuré par en-tête, et `COOP`/`COEP` sont
+> indisponibles. Ces écarts sont assumés pour un POC sans données réelles, pas pour la production.
 
 | Contrôle | Phase | Détail |
 |----------|-------|--------|
-| CSP stricte | 1 | Ni `unsafe-inline`, ni `unsafe-eval`, ni `*` sur `script-src` ; servie en en-tête HTTP, pas en `<meta>` ; vérifiée par test |
-| Aucune origine tierce | 1 | Tout est bundlé et servi par l'origine. Aucun CDN, aucune police distante, aucune analytique. Vérifié par assertion sur toutes les requêtes d'un parcours complet |
-| Service worker traité comme du code sensible | 1 | Dossier isolé (`apps/web/src/sw/`), CODEOWNERS sécurité, revue obligatoire, pas de `skipWaiting` silencieux, aucune réponse contenant du contenu utilisateur mise en cache |
+| CSP stricte | 1 | Ni `unsafe-inline`, ni `unsafe-eval`, ni `*` sur `script-src` ; vérifiée par test. ⚠️ Posée en `<meta http-equiv>` faute d'en-tête : `frame-ancestors`, `sandbox` et les rapports de violation sont **indisponibles** (R30) |
+| Aucune origine tierce | 1 | Tout est bundlé et servi par l'origine. Aucune dépendance CDN, aucune police distante, aucune analytique. Vérifié par assertion sur toutes les requêtes d'un parcours complet. *(Servir l'application elle-même via le CDN de GitHub est un sujet distinct, traité par ADR-0012.)* |
+| Service worker traité comme du code sensible | 1 | Dossier isolé (`apps/web/src/sw/`), CODEOWNERS sécurité, revue obligatoire, pas de `skipWaiting` silencieux, aucune réponse contenant du contenu utilisateur mise en cache. Portée limitée au sous-chemin `/veille-app/` |
 | Persistance du stockage | 1 | `navigator.storage.persist()` demandé, état **affiché** à l'utilisateur, export encouragé |
-| Isolation d'origine | 1 | `Cross-Origin-Opener-Policy`, `Cross-Origin-Embedder-Policy`, `X-Frame-Options`/`frame-ancestors` : l'application n'est jamais encadrable |
-| Déploiement depuis la CI uniquement | 1 | Aucun dépôt manuel de fichiers sur l'hébergement ; accès restreint et MFA |
+| Isolation d'origine | 1 | ⚠️ **Dégradé** : `COOP`/`COEP`/`X-Frame-Options` impossibles sur Pages. Conséquences : pas de `SharedArrayBuffer` (donc Argon2id mono-thread) et anti-cadrage réduit à un contrôle JavaScript, **faible et assumé** (R30) |
+| Déploiement depuis la CI uniquement | 1 | Aucun dépôt manuel de fichiers. Le contrôle d'accès effectif est la **protection de `main`** (PR + CI verte) et la MFA sur les comptes ayant droit d'écriture — ⚠️ protection de `main` **non appliquée à ce jour** |
+| URL publique non indexée | 1 | `robots.txt` + `<meta name="robots" content="noindex">` ; bandeau « version d'évaluation » non masquable, traité comme un **contrôle** et non comme une mention (R29) |
 | Extensions de navigateur | 1 | **Non mitigeable** — documenté comme risque résiduel (R27) |
 
 ---

@@ -88,7 +88,8 @@ Le chat n'est jamais la source de vérité : **Git, le code, les tests, la docum
 [0008](docs/decisions/0008-perimetre-juridique.md) périmètre juridique ·
 [0009](docs/decisions/0009-observabilite-sans-pii.md) observabilité sans PII ·
 [0010](docs/decisions/0010-hebergement-ue-e2ee.md) hébergement UE et zero-knowledge ·
-**[0011](docs/decisions/0011-pwa-poc-phase-1.md) PWA pour le POC de Phase 1**
+**[0011](docs/decisions/0011-pwa-poc-phase-1.md) PWA pour le POC de Phase 1** ·
+**[0012](docs/decisions/0012-github-pages-poc.md) GitHub Pages pour distribuer le POC**
 
 ---
 
