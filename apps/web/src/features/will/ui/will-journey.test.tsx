@@ -289,3 +289,112 @@ describe("the will journey", () => {
     expect(await axe(container, noContrast)).toHaveNoViolations();
   });
 });
+
+describe("legs or will: the explanation on the hub", () => {
+  it("explains the three terms, says it is not legal advice, and keeps the permanent warning", async () => {
+    const user = userEvent.setup();
+    setup();
+    await createProfile(user);
+    await openLegs(user);
+    const box = screen.getByText(w.explainer.title).closest("details")!;
+    expect(box).toHaveAttribute("open"); // first visit: the explanation is in view
+    for (const k of ["testament", "legacy", "wishes"] as const) {
+      expect(within(box).getByText(w.explainer[k].term)).toBeInTheDocument();
+      expect(within(box).getByText(w.explainer[k].text)).toBeInTheDocument();
+    }
+    expect(within(box).getByText(w.explainer.footnote)).toBeInTheDocument();
+    expect(screen.getByTestId("will-disclaimer")).toBeInTheDocument();
+  });
+
+  it("folds away once the person has started, so the cards stay in view", async () => {
+    const user = userEvent.setup();
+    setup();
+    await createProfile(user);
+    await openLegs(user);
+    await user.click(
+      within(screen.getByRole("region", { name: w.hub.cards.draft.title })).getByRole("link"),
+    );
+    await user.type(screen.getByLabelText(w.q.testatorFullName.label), "Personne Fictive");
+    await user.click(screen.getByRole("button", { name: w.save.exit }));
+    await screen.findByRole("heading", { level: 1, name: w.hub.title });
+    expect(screen.getByText(w.explainer.title).closest("details")).not.toHaveAttribute("open");
+  });
+});
+
+describe("Faire le point: what is missing, in words", () => {
+  async function startedDraftReview(user: User) {
+    await createProfile(user);
+    await openLegs(user);
+    await user.click(
+      within(screen.getByRole("region", { name: w.hub.cards.draft.title })).getByRole("link"),
+    );
+    await user.type(screen.getByLabelText(w.q.testatorFullName.label), "Personne Fictive");
+    await user.click(nextButton());
+    await answer(user, w.q.maritalStatus.options.married);
+    await user.click(screen.getByRole("button", { name: w.save.exit }));
+    await user.click(await screen.findByRole("link", { name: w.hub.review }));
+    await screen.findByRole("heading", { level: 1, name: w.review.title });
+  }
+
+  it("names each missing answer by its question, with a link to answer it", async () => {
+    const user = userEvent.setup();
+    setup();
+    await startedDraftReview(user);
+    const card = screen.getByRole("region", { name: w.review.objects.draft });
+    expect(within(card).getByText(/^Réponses manquantes : \d+$/)).toBeInTheDocument();
+    const link = within(card).getByRole("link", {
+      name: `Répondre à : ${w.q.hasChildren.title}`,
+    });
+    expect(within(card).getByText(w.q.hasChildren.title)).toBeInTheDocument();
+    await userEvent.setup().click(link);
+    expect(
+      await screen.findByRole("heading", { level: 1, name: w.q.hasChildren.title }),
+    ).toBeVisible();
+  });
+
+  it("shows how far along a part is, in numbers and not by a bar alone", async () => {
+    const user = userEvent.setup();
+    setup();
+    await startedDraftReview(user);
+    const card = screen.getByRole("region", { name: w.review.objects.draft });
+    expect(within(card).getByText(/^\d+ réponses sur \d+$/)).toBeInTheDocument();
+    expect(within(card).getByRole("list", { name: w.review.meterLabel })).toBeInTheDocument();
+  });
+
+  it("separates what needs a professional from what is merely missing", async () => {
+    const user = userEvent.setup();
+    setup();
+    await startedDraftReview(user);
+    const card = screen.getByRole("region", { name: w.review.objects.draft });
+    expect(
+      within(card).getByRole("heading", { name: w.review.blocking.title }),
+    ).toBeInTheDocument();
+    expect(within(card).getByText(w.review.blocking.hint)).toBeInTheDocument();
+    expect(within(card).getByRole("link", { name: w.finding.change })).toBeInTheDocument();
+  });
+
+  it("folds the long list of questions so the page stays readable", async () => {
+    const user = userEvent.setup();
+    setup();
+    await startedDraftReview(user);
+    const card = screen.getByRole("region", { name: w.review.objects.draft });
+    const more = within(card).getByText(/^Voir les \d+ autres questions$/);
+    expect(more.closest("details")).not.toHaveAttribute("open");
+    expect(within(card).getAllByRole("link", { name: /^Répondre à : / }).length).toBeGreaterThan(5);
+  });
+
+  it("explains the labels, and says a part not started is not a problem", async () => {
+    const user = userEvent.setup();
+    setup();
+    await startedDraftReview(user);
+    const legend = screen.getByText(w.review.legend.title).closest("details")!;
+    expect(legend).not.toHaveAttribute("open");
+    await userEvent.setup().click(screen.getByText(w.review.legend.title));
+    expect(within(legend).getByText(w.review.legend.incomplete)).toBeVisible();
+    expect(
+      within(screen.getByRole("region", { name: w.review.objects.wishes })).getByText(
+        w.review.notStarted,
+      ),
+    ).toBeInTheDocument();
+  });
+});

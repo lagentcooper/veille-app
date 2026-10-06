@@ -6,6 +6,7 @@ import { CreateProfileScreen } from "../features/profile/ui/CreateProfileScreen"
 import { UnlockScreen } from "../features/profile/ui/UnlockScreen";
 import { WelcomeScreen } from "../features/profile/ui/WelcomeScreen";
 import { DataLocationScreen } from "../features/shell/ui/DataLocationScreen";
+import { AppHeader } from "../features/shell/ui/AppHeader";
 import { EvaluationBanner } from "../features/shell/ui/EvaluationBanner";
 import { HomeScreen } from "../features/shell/ui/HomeScreen";
 import { WillWorkspaceProvider, type WillServices } from "../features/will/ui/WillWorkspace";
@@ -58,6 +59,7 @@ export function App({ update, will }: { update: UpdateHandle | null; will: WillS
         {t("app.skipToContent")}
       </a>
       <EvaluationBanner />
+      <AppHeader />
       {update ? (
         <Alert tone="info" role="status">
           {t("update.available")}{" "}

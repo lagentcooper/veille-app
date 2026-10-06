@@ -1,14 +1,42 @@
+/* Application shell. Tokens and components come from @veille/ui. No inline styles (strict CSP). */
+
+/* Permanent evaluation notice: slim, always visible, never dismissible (ADR-0011, R29) */
 .app-banner {
   padding: var(--v-space-2) var(--v-space-3);
   background: var(--v-color-banner-bg);
   color: var(--v-color-banner-text);
   font-size: var(--v-font-size-small);
+  line-height: 1.4;
   text-align: center;
 }
+
+.app-header {
+  background: var(--v-color-surface);
+  border-bottom: 0.0625rem solid var(--v-color-border);
+}
+.app-header__inner {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  max-width: var(--v-measure);
+  margin: 0 auto;
+  padding: 0.625rem var(--v-space-3);
+}
+.app-header__logo {
+  width: 2rem;
+  height: 2rem;
+}
+.app-header__name {
+  font-size: 1.25rem;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  color: var(--v-color-primary);
+}
+
 .app-main {
   max-width: var(--v-measure);
   margin: 0 auto;
-  padding: var(--v-space-4) var(--v-space-3) var(--v-space-5);
+  padding: var(--v-space-4) var(--v-space-3) 3rem;
 }
 .app-main:focus {
   outline: none;
@@ -18,18 +46,26 @@
   inset-inline-start: var(--v-space-2);
   top: -4rem;
   padding: var(--v-space-2) var(--v-space-3);
-  background: var(--v-color-bg);
+  background: var(--v-color-surface);
   color: var(--v-color-text);
   z-index: 10;
 }
 .app-skip:focus {
   top: var(--v-space-2);
 }
+
 a {
   color: var(--v-color-primary);
-  display: inline-block;
+  text-underline-offset: 0.2em;
+}
+/* Plain text links keep a comfortable target; links styled as buttons are sized by .v-button */
+a:not(.v-button) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
   min-height: var(--v-target-min);
   padding-block: var(--v-space-2);
+  font-weight: 600;
 }
 summary {
   min-height: var(--v-target-min);
@@ -37,10 +73,138 @@ summary {
   cursor: pointer;
 }
 
+.app-lead {
+  font-size: 1.1875rem;
+  color: var(--v-color-text-muted);
+}
+
+/* Welcome: three reassurances, each with an icon */
+.app-points {
+  display: flex;
+  flex-direction: column;
+  gap: var(--v-space-3);
+  margin: 0;
+  padding: var(--v-space-4);
+  list-style: none;
+  border-radius: var(--v-radius-card);
+  background: var(--v-color-surface);
+  box-shadow: var(--v-shadow-card);
+}
+.app-points li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--v-space-3);
+}
+.app-points__icon,
+.will-part__icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  background: var(--v-color-tint);
+  color: var(--v-color-primary);
+}
+
 /* Will journey */
-.will-status {
+.will-part__head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--v-space-2) var(--v-space-3);
+  margin-bottom: var(--v-space-2);
+}
+.will-part__head h2 {
+  flex: 1 1 11rem;
+  min-width: 0;
+  margin: 0;
+}
+.will-part__head .v-badge {
+  flex: none;
+}
+.will-part .v-button {
+  align-self: flex-start;
+}
+
+.will-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--v-space-2);
+  margin: 0 0 var(--v-space-3);
+  padding: 0;
+  list-style: none;
+}
+.will-summary li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--v-space-2) var(--v-space-3);
+  padding-block: var(--v-space-2);
+  border-bottom: 0.0625rem solid var(--v-color-border);
+}
+.will-summary li:last-child {
+  border-bottom: 0;
+}
+.will-summary li > span:first-child {
   font-weight: 600;
 }
+
+.will-legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--v-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.will-legend li {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--v-space-1);
+}
+
+.will-group {
+  margin-top: var(--v-space-4);
+  padding-top: var(--v-space-3);
+  border-top: 0.0625rem solid var(--v-color-border);
+}
+.will-group h3 {
+  margin-bottom: var(--v-space-1);
+}
+.will-group .v-field__hint {
+  margin-bottom: var(--v-space-3);
+}
+
+.will-todo {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.will-todo li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--v-space-3);
+  padding-block: var(--v-space-2);
+  border-bottom: 0.0625rem solid var(--v-color-border);
+}
+.will-todo li:last-child {
+  border-bottom: 0;
+}
+.will-todo li > span {
+  flex: 1;
+  min-width: 0;
+}
+.will-todo a {
+  flex: none;
+}
+
 .will-findings {
   display: flex;
   flex-direction: column;
@@ -49,6 +213,56 @@ summary {
   padding-inline-start: 0;
   list-style: none;
 }
+.will-findings li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--v-space-3);
+}
+.will-findings li > .v-icon {
+  margin-top: 0.2rem;
+}
+.will-findings li[data-kind="blocking"] > .v-icon {
+  color: var(--v-color-danger);
+}
+.will-findings li:not([data-kind="blocking"]) > .v-icon {
+  color: var(--v-color-warning-accent);
+}
+.will-findings__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.will-explainer__terms {
+  display: flex;
+  flex-direction: column;
+  gap: var(--v-space-3);
+  margin: 0 0 var(--v-space-3);
+}
+.will-explainer__terms > div {
+  padding: var(--v-space-3);
+  border-radius: var(--v-radius);
+  background: var(--v-color-surface-alt);
+}
+.will-explainer__terms dt {
+  margin-bottom: var(--v-space-1);
+  font-weight: 700;
+  color: var(--v-color-primary);
+}
+.will-explainer__terms dd {
+  margin: 0;
+}
+.will-explainer__sub {
+  font-size: 1.125rem;
+}
+.will-explainer__here {
+  margin: 0 0 var(--v-space-3);
+  padding-inline-start: 1.25rem;
+}
+.will-explainer__footnote {
+  color: var(--v-color-text-muted);
+  font-size: var(--v-font-size-small);
+}
+
 .will-save {
   margin: 0;
   color: var(--v-color-text-muted);
@@ -63,7 +277,7 @@ summary {
   list-style: none;
 }
 .will-versions dt {
-  font-weight: 600;
+  font-weight: 650;
 }
 .will-versions dd {
   margin: 0 0 var(--v-space-2);
@@ -72,4 +286,12 @@ summary {
   margin: 0;
   font-size: var(--v-font-size-small);
   line-height: 1.45;
+}
+
+.will-more {
+  margin-top: var(--v-space-2);
+}
+.will-more summary {
+  font-weight: 650;
+  color: var(--v-color-primary);
 }

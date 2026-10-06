@@ -422,3 +422,44 @@ test.describe("accessibility of the will journey", () => {
     expect(overflow).toBe(false);
   });
 });
+
+test.describe("understanding the journey", () => {
+  test("the hub explains legs, testament and wishes in a documentation insert", async ({
+    page,
+  }) => {
+    await createProfile(page);
+    await openLegs(page);
+    const box = page.locator("details", { hasText: "Legs, testament : quelle différence ?" });
+    await expect(box).toHaveAttribute("open", "");
+    for (const term of ["Un testament", "Un legs", "Vos volontés hors testament"]) {
+      await expect(box.getByText(term, { exact: true })).toBeVisible();
+    }
+    await expect(box.getByText("Ce n'est pas un conseil juridique.")).toBeVisible();
+    await expect(page.getByTestId("will-disclaimer")).toBeVisible();
+    // it can be folded, by keyboard too
+    await box.locator("summary").focus();
+    await page.keyboard.press("Enter");
+    await expect(box).not.toHaveAttribute("open", "");
+  });
+
+  test("'Faire le point' names each missing answer by its question and links to it", async ({
+    page,
+  }) => {
+    await createProfile(page);
+    await openLegs(page);
+    await startCard(page, "Brouillon de testament à recopier à la main");
+    await page.getByLabel("Prénom(s) et nom").fill(SENTINELS.name);
+    await next(page);
+    await answer(page, "Célibataire");
+    await page.getByRole("button", { name: "Enregistrer et quitter" }).click();
+    await page.getByRole("link", { name: "Faire le point" }).first().click();
+    const card = page.getByRole("region", { name: "Brouillon de testament", exact: true });
+    await expect(card.getByText(/^Réponses manquantes : \d+$/)).toBeVisible();
+    await expect(card.getByText(/^\d+ réponses sur \d+$/)).toBeVisible();
+    await card.getByRole("link", { name: /^Répondre à : Avez-vous des enfants/ }).click();
+    await expect(
+      page.getByRole("heading", { level: 1, name: /Avez-vous des enfants/ }),
+    ).toBeVisible();
+    await expectNoViolations(page);
+  });
+});

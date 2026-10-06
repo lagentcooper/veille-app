@@ -1,4 +1,4 @@
-import { Alert, Button, Card } from "@veille/ui";
+import { Alert, Button, Card, Icon } from "@veille/ui";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
@@ -8,11 +8,17 @@ export function HomeScreen({ firstName, onLock }: { firstName: string; onLock: (
     <div className="v-stack">
       <h1>{t("home.title", { name: firstName })}</h1>
       <Alert tone="success">{t("home.ready")}</Alert>
-      <Card aria-labelledby="home-legs">
-        <h2 id="home-legs">{t("home.legs")}</h2>
+      <Card aria-labelledby="home-legs" className="will-part">
+        <div className="will-part__head">
+          <span className="will-part__icon">
+            <Icon name="pen" />
+          </span>
+          <h2 id="home-legs">{t("home.legs")}</h2>
+        </div>
         <p>{t("home.legsBody")}</p>
         <Link className="v-button" to="/legs">
           {t("home.legsOpen")}
+          <Icon name="arrow-right" />
         </Link>
       </Card>
       <Card aria-label={t("home.soon")}>
@@ -21,6 +27,7 @@ export function HomeScreen({ firstName, onLock }: { firstName: string; onLock: (
       </Card>
       <Link to="/donnees">{t("home.whereData")}</Link>
       <Button variant="secondary" block onClick={onLock}>
+        <Icon name="lock" />
         {t("home.lock")}
       </Button>
     </div>

@@ -46,6 +46,57 @@ describe("disabled control colours (WCAG 1.4.3, AA = 4.5:1)", () => {
   });
 });
 
+/** Every pair the interface actually draws: [foreground, background]. */
+const TEXT_PAIRS: ReadonlyArray<[string, string]> = [
+  ["v-color-text", "v-color-bg"],
+  ["v-color-text", "v-color-surface"],
+  ["v-color-text-muted", "v-color-bg"],
+  ["v-color-text-muted", "v-color-surface"],
+  ["v-color-text-muted", "v-color-surface-alt"],
+  ["v-color-on-primary", "v-color-primary"],
+  ["v-color-on-primary", "v-color-primary-hover"],
+  ["v-color-on-tint", "v-color-tint"],
+  ["v-color-on-tint", "v-color-tint-hover"],
+  ["v-color-primary", "v-color-surface"],
+  ["v-color-primary", "v-color-bg"],
+  ["v-color-primary", "v-color-surface-alt"],
+  ["v-color-success-text", "v-color-success-bg"],
+  ["v-color-warning-text", "v-color-warning-bg"],
+  ["v-color-danger-text", "v-color-danger-bg"],
+  ["v-color-neutral-text", "v-color-neutral-bg"],
+  ["v-color-danger-text", "v-color-surface"],
+  ["v-color-banner-text", "v-color-banner-bg"],
+  ["v-color-disabled-text", "v-color-surface-alt"],
+  ["v-color-on-primary", "v-color-danger"],
+];
+
+/** Non-text parts that carry meaning (borders of controls, coloured spines, icons): 3:1 (WCAG 1.4.11). */
+const UI_PAIRS: ReadonlyArray<[string, string]> = [
+  ["v-color-border-strong", "v-color-surface"],
+  ["v-color-border-strong", "v-color-bg"],
+  ["v-color-success-accent", "v-color-surface"],
+  ["v-color-warning-accent", "v-color-surface"],
+  ["v-color-danger", "v-color-surface"],
+  ["v-color-neutral-accent", "v-color-surface"],
+  ["v-color-focus", "v-color-surface"],
+  ["v-color-focus", "v-color-bg"],
+];
+
+describe("palette", () => {
+  it.each(TEXT_PAIRS)("text %s on %s is at least 4.5:1", (fg, bg) => {
+    expect(contrast(token(fg), token(bg))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it.each(UI_PAIRS)("meaningful graphic %s on %s is at least 3:1", (fg, bg) => {
+    expect(contrast(token(fg), token(bg))).toBeGreaterThanOrEqual(3);
+  });
+
+  it("keeps the four state tints distinct from one another", () => {
+    const tints = ["success", "warning", "danger", "neutral"].map((n) => token(`v-color-${n}-bg`));
+    expect(new Set(tints).size).toBe(4);
+  });
+});
+
 describe("button styles", () => {
   it("never fade a control with opacity (it composes text and background with what is behind)", () => {
     expect(css).not.toMatch(/opacity\s*:/);

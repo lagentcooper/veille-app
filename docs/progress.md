@@ -123,6 +123,26 @@
     `.playwright-artifacts-*/` ajoutés à `.gitignore`. Données fictives ici, mais c'est l'habitude
     qu'interdit AGENTS.md §10.
 
+- **Refonte UI/UX** (session *UX/UI*, branche `feature/ui-refresh`)
+  - Système visuel : palette « papier chaud + bleu pétrole » et **quatre teintes qui ont un sens** (sauge =
+    complet, ambre = à compléter, terracotta = à voir avec un professionnel, ardoise = pas commencé),
+    jamais décoratives ; l'état n'est jamais porté par la couleur seule (icône + mots). Icônes SVG
+    dessinées dans `packages/ui` (rien n'est chargé à l'exécution, CSP inchangée). Cartes élevées,
+    en-tête de marque, boutons et champs plus généreux, bandeau « version d'évaluation » conservé.
+  - Nouveaux composants `packages/ui` : `Icon`, `Badge`, `Callout` (encart repliable natif), `Meter` ;
+    `Alert` porte une icône, `Card` une teinte.
+  - **Encart « Legs, testament : quelle différence ? »** sur l'écran du document de legs (ouvert à la
+    première visite, replié ensuite). Le message de prévention permanent est inchangé.
+    ⚖️ **VALIDATION JURIDIQUE REQUISE** : les définitions (testament, legs, volontés hors testament,
+    « sans testament la loi prévoit qui hérite », « la loi réserve une part à certains proches ») sont
+    en langage courant, écrites sans relecture d'un juriste (`will.explainer.*` dans `will-fr.ts`).
+  - **« Faire le point » plus lisible** : récapitulatif des trois parties, légende des étiquettes, et, par
+    partie, « 2 réponses sur 12 » puis trois groupes distincts — *À voir avec un professionnel*,
+    *Réponses manquantes* (chaque manque est **nommé par sa question**, avec un lien « Répondre », les
+    autres repliés au-delà de 5), *À vérifier*. Logique dans `domain/review-groups.ts`, testée sans rendu.
+  - Tests : jetons de la palette (≥ 4,5:1 texte, ≥ 3:1 éléments porteurs de sens), regroupement des
+    manques, encart et « Faire le point » en composants et en E2E.
+
 ## In Progress
 
 - **Phase 1 — POC UX/UI en PWA.** Phase ouverte : l'architecture est validée (D22) et la plateforme

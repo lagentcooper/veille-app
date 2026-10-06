@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useFocusHeading } from "../../../app/use-focus-heading";
 import { indexOfStep, type Step } from "../domain/steps";
+import { useStepTitle } from "./use-step-title";
 
 const ANSWERS = ["yes", "no", "unknown"] as const;
 
@@ -31,6 +32,7 @@ export function WizardScreen<T>({
   onFinish,
 }: Props<T>) {
   const { t, i18n } = useTranslation();
+  const stepTitle = useStepTitle();
   const index = indexOfStep(steps, stepId);
   const step = steps[index]!;
   const heading = useFocusHeading(step.id);
@@ -41,14 +43,7 @@ export function WizardScreen<T>({
   const back = () => (index === 0 ? onExit() : goTo(steps[index - 1]!.id));
 
   const base = `will.q.${step.key}`;
-  const rawName = step.params?.["name"];
-  const title = (() => {
-    if (step.kind === "more") return t(`${base}.${step.hasAny ? "title" : "first"}`);
-    if (rawName !== undefined && rawName.trim() === "" && i18n.exists(`${base}.titleNoName`))
-      return t(`${base}.titleNoName`);
-    const name = rawName?.trim() ? rawName.trim() : t("will.wizard.unnamedPerson");
-    return t(`${base}.title`, { ...step.params, name });
-  })();
+  const title = stepTitle(step);
   const hint = i18n.exists(`${base}.hint`) ? t(`${base}.hint`) : "";
   const label = i18n.exists(`${base}.label`) ? t(`${base}.label`) : title;
 
