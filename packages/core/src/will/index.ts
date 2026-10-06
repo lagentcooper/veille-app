@@ -1,17 +1,17 @@
-export * from './model';
-export * from './findings';
-export * from './environment';
-export { assessDossier, type DossierAssessment, type WillDossier } from './assess';
-export { assessWillDraft } from './rules-draft';
-export { assessWishesDocument } from './rules-wishes';
-export { assessPhysicalWillRecord } from './rules-physical-record';
+export * from "./model";
+export * from "./findings";
+export * from "./environment";
+export { assessDossier, type DossierAssessment, type WillDossier } from "./assess";
+export { assessWillDraft } from "./rules-draft";
+export { assessWishesDocument } from "./rules-wishes";
+export { assessPhysicalWillRecord } from "./rules-physical-record";
 export {
   FINDING_MESSAGE_KEYS,
   HANDWRITING_GUIDE_STEP_KEYS,
   NOTARY_STEP_KEY,
   WILL_DISCLAIMER_KEYS,
-} from './messages';
-export { canonicalJson } from './canonical';
+} from "./messages";
+export { canonicalJson } from "./canonical";
 export {
   appendVersion,
   createHistory,
@@ -21,7 +21,7 @@ export {
   type VersionIssue,
   type VersionIssueCode,
   type WillVersion,
-} from './versions';
+} from "./versions";
 export {
   parsePhysicalWillRecord,
   parseWillDraft,
@@ -30,8 +30,8 @@ export {
   type ParseIssue,
   type ParseIssueCode,
   type ParseResult,
-} from './parse';
-export { buildWillJsonSchema } from './vea-schema';
+} from "./parse";
+export { buildWillJsonSchema } from "./vea-schema";
 export {
   deserializeWillFromVea,
   serializeWillToVea,
@@ -41,4 +41,4 @@ export {
   type VeaReadError,
   type VeaReadResult,
   type WillWorkspace,
-} from './vea';
+} from "./vea";

@@ -1,0 +1,10 @@
+// Typecheck of packages/core TESTS. Extends the source config rather than restating it, and only
+// widens what the tests genuinely need: `@types/node`, because they read the source tree
+// (tests/will/contract.test.ts) and hash fixtures with node:crypto.
+//
+// The source stays covered by tsconfig.core.json with `types: []`. No file is covered twice.
+{
+  "extends": "./tsconfig.core.json",
+  "compilerOptions": { "types": ["node"] },
+  "include": ["../core/tests/**/*.ts"]
+}

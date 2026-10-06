@@ -1,7 +1,7 @@
 # Current Progress
 
 > Mis à jour à chaque tâche significative. **Aucune donnée personnelle, aucun secret ici.**
-> Dernière mise à jour : 2026-10-06 — session *UX/UI* (`fix/disabled-contrast`).
+> Dernière mise à jour : 2026-10-06 — sessions *Web* (C), *QA* et *UX/UI*, intégrées ensemble.
 
 ## Completed
 
@@ -97,6 +97,32 @@
   - Gardes : `packages/ui/tests/tokens.test.ts` (ratios ≥ 4,5:1, aucune `opacity`, aucune `transition`)
     et un E2E sur la durée de transition des boutons.
 
+- **Câblage de `packages/core` et hygiène** (session *QA*, branche `fix/core-workspace-wiring`)
+  - **Les 97 cas du domaine legs n'étaient exécutés par rien.** `packages/core` n'avait pas de
+    `package.json`, donc n'était pas un paquet du workspace, donc n'avait pas de script `test` ;
+    la CI listait `@veille/ui` et `@veille/web` à la main. Les 20 cas bloquants juridiques
+    (réservataires, immobilier, extranéité, régime matrimonial, majeur protégé, personne morale,
+    famille recomposée, clause conditionnelle) n'étaient assertés par aucun test exécuté.
+  - `packages/core` devient `@veille/core`, avec une carte `exports` sur la source — pas d'étape de
+    build : Vite et `tsc` lisent le `.ts` directement, comme `@veille/ui` le fait déjà.
+  - `apps/web` déclare `@veille/core` en `workspace:*` et **l'alias disparaît des quatre endroits**
+    qui le portaient (`tsconfig.base.json`, `apps/web/tsconfig.json`, `vite.config.ts`,
+    `vitest.config.ts`). Un seul mécanisme. La session C peut importer `@veille/core/will` sans
+    toucher à une configuration.
+  - La CI exécute `pnpm test` (Turborepo) au lieu d'une liste de filtres : un nouveau paquet est
+    couvert le jour où il est créé.
+  - Typecheck **étendu, pas dupliqué** : `tsconfig.core.json` garde la source sous `types: []`,
+    `tsconfig.core-tests.json` l'étend pour couvrir les tests avec `@types/node`. Aucun fichier
+    couvert deux fois ; `packages/core` n'a toujours pas de `tsconfig` propre.
+  - `packages/core` passe sous Prettier (la note `//format` du `package.json` racine est levée).
+    Au passage : le test de pureté du domaine ne reconnaissait que les quotes simples — le
+    reformatage l'aurait rendu **vacu** (assertions sur zéro import, toujours vertes). Rendu
+    insensible aux quotes, avec une assertion qui garde le garde-fou.
+  - **52 artefacts Playwright (1,3 Mo) retirés du suivi Git** : traces, enregistrements réseau,
+    capture vidéo, instantanés DOM des pages testées. `test-results/`, `playwright-report/` et
+    `.playwright-artifacts-*/` ajoutés à `.gitignore`. Données fictives ici, mais c'est l'habitude
+    qu'interdit AGENTS.md §10.
+
 ## In Progress
 
 - **Phase 1 — POC UX/UI en PWA.** Phase ouverte : l'architecture est validée (D22) et la plateforme
@@ -141,7 +167,9 @@ critères de fin — dans [`docs/product/05-briefs-sessions.md`](product/05-brie
 2. **Session B — `feature/will-domain`**, en parallèle de A (aucun fichier partagé) : règles métier du
    legs en TypeScript pur — `WillDraft` / `WishesDocument` / `PhysicalWillRecord`, versions immuables,
    moteur de complétude, cas bloquants « voir un notaire », sérialisation VEA.
-3. ~~**Session C — `feature/will-poc`**~~ : livrée en PR (voir Completed).
+3. ~~**Session C — `feature/will-poc`**~~ : livrée et fusionnée dans `pre`.
+   Le câblage de `@veille/core` est en place (session *QA*) : `import { ... } from "@veille/core/will"`
+   fonctionne sans configuration, et les tests du domaine s'exécutent en CI.
 4. **Tests utilisateurs du parcours de legs** (≥ 5 personnes dont ≥ 2 de plus de 65 ans) — c'est
    l'objet même de la Phase 1. **Ne pas ouvrir d'autre chantier avant.**
 5. Trancher les décisions 🔴 restantes (D1, D2, D3, D8, D9, D25). **D2 tranchée** : option (c), trois
@@ -173,10 +201,17 @@ le porteur a restreint le POC au seul document de legs.*
 - Les deux conflits signalés précédemment par la session QA (incohérence de phase dans `AGENTS.md` §2,
   et piste PWA contredisant ADR-0002) sont **résolus** : le porteur a tranché, la documentation est
   alignée et ADR-0011 porte la décision.
+- **Trou de couverture confirmé**, détaillé dans
+  [`09-strategie-tests.md`](architecture/09-strategie-tests.md) §11.2 bis : le critère de Phase 1
+  « **aucune PII dans les logs** » (roadmap, AGENTS.md §6.3) n'est asserté par **aucun** test —
+  `console-logger.ts` n'est couvert par rien et il n'existe pas de scanner de motifs. À produire
+  avant les tests utilisateurs. Également ouverts : assertions d'octets sur le stockage chiffré,
+  et Playwright sur Chromium seulement là où la matrice vise aussi WebKit.
+- **Leçon de méthode** : un paquet livré sans `package.json` est invisible pour le workspace, donc
+  ses tests ne s'exécutent pas, et une CI qui nomme ses paquets à la main ne le signale jamais.
+  La CI appelle désormais `pnpm test`. Toute session qui crée un paquet doit vérifier qu'il
+  apparaît dans la sortie de `pnpm test` — pas seulement que ses tests passent en local.
 - **Parcours legs — points à traiter, non corrigés par la session C (hors de son périmètre)** :
-  - `packages/core` n'a pas de `package.json` : les tests du domaine legs (`packages/core/tests/**`) ne
-    sont **pas exécutés par la CI**. À brancher (session A / QA).
-  - Un utilisateur qui répond « Je ne sais pas » à une question reste ⚠️ indéfiniment : le domaine ne
     distingue pas « pas encore répondu » de « ne sait pas ». À arbitrer (produit + domaine).
   - Marié sans enfant : deux 🛑 pour la même personne (héritier réservataire *et* régime matrimonial).
   - L'avertissement « mot de passe » ne couvre ni l'intitulé des papiers ni la description des volontés.

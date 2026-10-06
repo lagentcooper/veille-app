@@ -14,8 +14,14 @@ coverage/
 .turbo/
 *.tsbuildinfo
 
-# Test and user data — AGENTS.md §10: never commit a real user document
+# Test and user data — AGENTS.md §10: never commit a real user document.
+# A Playwright trace embeds DOM snapshots, a screencast and the captured network of the run.
+# playwright.config.ts writes under tmp/, but these are Playwright's defaults and come back
+# as soon as a run happens outside that config or with --output.
 tmp/
+test-results/
+playwright-report/
+.playwright-artifacts-*/
 *.log
 
 # OS and editor noise

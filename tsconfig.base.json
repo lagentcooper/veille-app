@@ -12,10 +12,6 @@
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "skipLibCheck": true,
-    "noEmit": true,
-    "paths": {
-      "@veille/core/ports": ["./packages/core/src/ports/index.ts"],
-      "@veille/core/will": ["./packages/core/src/will/index.ts"]
-    }
+    "noEmit": true
   }
 }

@@ -22,13 +22,26 @@ export const LIMITS = {
 } as const;
 
 /** Tri-state answer: `unknown` means "not answered yet" and is reported as missing information. */
-export const ANSWERS = ['yes', 'no', 'unknown'] as const;
+export const ANSWERS = ["yes", "no", "unknown"] as const;
 export type Answer = (typeof ANSWERS)[number];
 
-export const MARITAL_STATUSES = ['single', 'married', 'pacs', 'divorced', 'widowed', 'unknown'] as const;
+export const MARITAL_STATUSES = [
+  "single",
+  "married",
+  "pacs",
+  "divorced",
+  "widowed",
+  "unknown",
+] as const;
 export type MaritalStatus = (typeof MARITAL_STATUSES)[number];
 
-export const LEGAL_PROTECTIONS = ['none', 'guardianship', 'curatorship', 'other', 'unknown'] as const;
+export const LEGAL_PROTECTIONS = [
+  "none",
+  "guardianship",
+  "curatorship",
+  "other",
+  "unknown",
+] as const;
 export type LegalProtection = (typeof LEGAL_PROTECTIONS)[number];
 
 /** Facts declared by the user; they drive the "consult a professional" cases (§2.2). */
@@ -51,7 +64,7 @@ export interface TestatorSituation {
   legalProtection: LegalProtection;
 }
 
-export const BENEFICIARY_KINDS = ['natural-person', 'legal-entity'] as const;
+export const BENEFICIARY_KINDS = ["natural-person", "legal-entity"] as const;
 export type BeneficiaryKind = (typeof BENEFICIARY_KINDS)[number];
 
 export interface Beneficiary {
@@ -62,7 +75,7 @@ export interface Beneficiary {
   isMinor: Answer;
 }
 
-export const PROVISION_CLAUSES = ['none', 'condition', 'charge'] as const;
+export const PROVISION_CLAUSES = ["none", "condition", "charge"] as const;
 export type ProvisionClause = (typeof PROVISION_CLAUSES)[number];
 
 export interface Provision {
@@ -106,10 +119,17 @@ export interface WishesDocument {
   bodyWishesNote: string;
 }
 
-export const WILL_EXISTENCES = ['unknown', 'none', 'exists'] as const;
+export const WILL_EXISTENCES = ["unknown", "none", "exists"] as const;
 export type WillExistence = (typeof WILL_EXISTENCES)[number];
 
-export const WILL_LOCATION_KINDS = ['unspecified', 'home', 'notary', 'relative', 'bank-safe', 'other'] as const;
+export const WILL_LOCATION_KINDS = [
+  "unspecified",
+  "home",
+  "notary",
+  "relative",
+  "bank-safe",
+  "other",
+] as const;
 export type WillLocationKind = (typeof WILL_LOCATION_KINDS)[number];
 
 export interface PhysicalWillRecord {
@@ -121,28 +141,32 @@ export interface PhysicalWillRecord {
   registeredInCentralFile: Answer;
 }
 
-export type WillSubject = 'will-draft' | 'wishes-document' | 'physical-will-record';
-export const WILL_SUBJECTS: readonly WillSubject[] = ['will-draft', 'wishes-document', 'physical-will-record'];
+export type WillSubject = "will-draft" | "wishes-document" | "physical-will-record";
+export const WILL_SUBJECTS: readonly WillSubject[] = [
+  "will-draft",
+  "wishes-document",
+  "physical-will-record",
+];
 
 export type WillSnapshot = WillDraft | WishesDocument | PhysicalWillRecord;
 
 export function createEmptyWillDraft(): WillDraft {
   return {
     schemaVersion: WILL_SCHEMA_VERSION,
-    testatorFullName: '',
+    testatorFullName: "",
     situation: {
-      maritalStatus: 'unknown',
-      spousalDonation: 'unknown',
-      hasChildren: 'unknown',
-      hasMinorChildren: 'unknown',
-      blendedFamily: 'unknown',
-      lifeInsurance: 'unknown',
-      ownsRealEstate: 'unknown',
-      ownsBusinessInterests: 'unknown',
-      assetsAbroad: 'unknown',
-      residesOutsideFrance: 'unknown',
-      foreignNationality: 'unknown',
-      legalProtection: 'unknown',
+      maritalStatus: "unknown",
+      spousalDonation: "unknown",
+      hasChildren: "unknown",
+      hasMinorChildren: "unknown",
+      blendedFamily: "unknown",
+      lifeInsurance: "unknown",
+      ownsRealEstate: "unknown",
+      ownsBusinessInterests: "unknown",
+      assetsAbroad: "unknown",
+      residesOutsideFrance: "unknown",
+      foreignNationality: "unknown",
+      legalProtection: "unknown",
     },
     beneficiaries: [],
     provisions: [],
@@ -153,20 +177,20 @@ export function createEmptyWillDraft(): WillDraft {
 export function createEmptyWishesDocument(): WishesDocument {
   return {
     schemaVersion: WILL_SCHEMA_VERSION,
-    funeralWishes: '',
+    funeralWishes: "",
     messages: [],
     papers: [],
-    hasBodyWishes: 'unknown',
-    bodyWishesNote: '',
+    hasBodyWishes: "unknown",
+    bodyWishesNote: "",
   };
 }
 
 export function createEmptyPhysicalWillRecord(): PhysicalWillRecord {
   return {
     schemaVersion: WILL_SCHEMA_VERSION,
-    existence: 'unknown',
-    locationKind: 'unspecified',
-    locationDetail: '',
-    registeredInCentralFile: 'unknown',
+    existence: "unknown",
+    locationKind: "unspecified",
+    locationDetail: "",
+    registeredInCentralFile: "unknown",
   };
 }

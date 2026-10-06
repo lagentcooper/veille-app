@@ -11,6 +11,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@veille/core": "workspace:*",
     "@veille/ui": "workspace:*",
     "hash-wasm": "^4.12.0",
     "i18next": "^25.0.0",

@@ -7,14 +7,6 @@ import { veillePwa } from "./vite/pwa-plugin";
 export default defineConfig({
   base: "/veille-app/",
   plugins: [react(), veillePwa()],
-  resolve: {
-    alias: {
-      "@veille/core/ports": new URL("../../packages/core/src/ports/index.ts", import.meta.url)
-        .pathname,
-      "@veille/core/will": new URL("../../packages/core/src/will/index.ts", import.meta.url)
-        .pathname,
-    },
-  },
   build: {
     target: "es2022",
     assetsInlineLimit: 0, // no data: URIs — the CSP does not allow them

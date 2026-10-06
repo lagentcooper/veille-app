@@ -146,6 +146,14 @@ pre           ← BRANCHE D'INTÉGRATION : toutes les sessions y convergent
   (`git fetch origin && git checkout -b feature/<sujet> origin/pre`) et ouvre sa PR **vers `pre`**,
   jamais vers `main`.
 - `main` ne reçoit que des promotions depuis `pre`, une fois l'ensemble cohérent et testé.
+- **Après chaque promotion, refusionner `main` dans `pre` dans la même séance :**
+  ```bash
+  git fetch origin && git checkout pre && git merge origin/main && git push origin pre
+  ```
+  Sans cela les deux branches divergent **à chaque fois**, et pas pour une raison de contenu : la
+  fusion d'une PR crée un commit de merge qui n'existe que sur `main`. `main` cesse donc d'être un
+  ancêtre de `pre`, la promotion suivante n'est plus une avance linéaire, et chaque session suivante
+  croit à un conflit réel. Deux commandes de plus, et le problème disparaît.
 - Avant d'ouvrir une PR : **re-synchroniser depuis `pre`** (`git merge origin/pre`) et résoudre les
   conflits chez soi, pas dans la PR.
 
