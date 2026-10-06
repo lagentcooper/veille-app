@@ -3,12 +3,14 @@
 But de ce document : permettre de lancer une session de développement **sans réexpliquer le projet**.
 Chaque brief est autonome et peut être collé tel quel comme message d'ouverture d'une nouvelle session.
 
-> **Pré-requis** : la PR « Phase 1 en PWA (ADR-0011) + socle qualité » doit être **mergée dans `pre`**
-> avant de lancer la moindre session ci-dessous. Elle apporte `.gitignore`, la CI, le PR template et
-> le pivot PWA. Démarrer avant, c'est garantir des conflits.
+> **Pré-requis, à la charge du porteur** : activer GitHub Pages —
+> *Settings → Pages → Build and deployment → Source : **GitHub Actions***. Sans cela, le workflow de
+> déploiement de la session A échouera. Cette opération ne peut pas être faite depuis une session
+> d'agent (l'API Pages est refusée par le proxy).
 >
-> Les documents `docs/decisions/0011-pwa-poc-phase-1.md` et `docs/architecture/02-poc-pwa.md`
-> (ex-`02-mobile-poc.md`) arrivent avec cette PR — ils sont cités sans lien tant qu'elle n'est pas mergée.
+> **Décisions applicables** : [ADR-0011](../decisions/0011-pwa-poc-phase-1.md) (le POC est une PWA) et
+> [ADR-0012](../decisions/0012-github-pages-poc.md) (il est publié sur GitHub Pages, avec les
+> contraintes que cela impose). À lire avant de configurer quoi que ce soit.
 
 ---
 
@@ -53,7 +55,27 @@ apps/web/**
 packages/ui/**
 packages/core/src/ports/**        (interfaces uniquement, aucune implémentation métier)
 packages/config/**
+.github/workflows/deploy-pages.yml
 ```
+
+### Contrainte de déploiement : GitHub Pages
+
+Lire `docs/decisions/0012-github-pages-poc.md` **avant de configurer le build**. Les quatre pièges,
+dans l'ordre où ils font perdre du temps :
+
+1. **Sous-chemin** `https://lagentcooper.github.io/veille-app/` → `base: '/veille-app/'` dans Vite,
+   et `scope` + `start_url` du manifeste alignés. Une PWA qui marche en local et casse en production,
+   c'est presque toujours ça.
+2. **Portée du service worker** limitée à `/veille-app/`. L'enregistrer avec un chemin relatif.
+3. **Aucun en-tête HTTP possible** → la CSP se pose en `<meta http-equiv="Content-Security-Policy">`.
+   Ne pas écrire de directive qui y est ignorée (`frame-ancestors`, `sandbox`, `report-to`) en croyant
+   qu'elle protège. Pas de `COOP`/`COEP` ⇒ **pas de `SharedArrayBuffer`** ⇒ Argon2id **mono-thread** :
+   calibrer les paramètres et **mesurer** le temps de déverrouillage sur un appareil modeste.
+4. **Pas de réécriture d'URL** → publier un `404.html` identique à `index.html`, sinon tout lien
+   profond tombe sur la page d'erreur de GitHub.
+
+Plus : `robots.txt` et `<meta name="robots" content="noindex">` — le POC est pour un panel recruté,
+pas pour les moteurs de recherche (risque R29).
 
 ### À livrer
 1. **Monorepo** : pnpm workspaces + Turborepo, TypeScript `strict`, ESLint/Prettier partagés.
@@ -74,17 +96,24 @@ packages/config/**
    `SecureKeyStore`, `Clock`, `Logger` — interfaces seulement, contrats identiques Phase 1 / Phase 3.
 6. Tests : composants (Testing Library DOM), accessibilité automatisée, un E2E Playwright
    « j'ouvre l'app, je crée un profil, je verrouille, je déverrouille ».
+7. **Déploiement** `.github/workflows/deploy-pages.yml` : build puis `actions/deploy-pages`, déclenché
+   sur `main` uniquement, `permissions: { pages: write, id-token: write, contents: read }`, actions
+   **épinglées par SHA** comme les workflows existants.
 
 ### Interdit
 Toute fonctionnalité de legs · toute IA · tout appel réseau · toute dépendance CDN ·
 toute implémentation de port dans `packages/core` (les adapters vivent dans `apps/web`).
 
 ### Critères de fin
-- [ ] L'application s'installe comme PWA et fonctionne **hors ligne** après premier chargement.
+- [ ] **Depuis l'URL GitHub Pages** (pas seulement en local) : l'application s'installe comme PWA et
+      fonctionne **hors ligne** après premier chargement, et un lien profond ne tombe pas sur un 404.
 - [ ] CSP stricte vérifiée : aucune violation en console, aucun `unsafe-inline`.
 - [ ] Aucune requête réseau après chargement initial (test automatisé).
+- [ ] Temps de déverrouillage (Argon2id mono-thread) **mesuré et consigné** dans la PR, sur un appareil
+      ou un profil de performance modeste.
 - [ ] Audit d'accessibilité automatisé sans violation bloquante + navigation clavier vérifiée à la main.
 - [ ] La règle ESLint d'isolation de `packages/core` échoue bien si on tente d'importer `window`.
+- [ ] `noindex` effectif (`robots.txt` + `meta`) et bandeau « version d'évaluation » non masquable.
 - [ ] CI verte, `progress.md` à jour.
 
 ---
