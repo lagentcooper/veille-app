@@ -50,7 +50,9 @@ test.describe("the will journey", () => {
     const { screens } = await fillDraft(page);
     await expect(page.getByText("Tout est complet selon notre checklist")).toBeVisible();
     await expect(page.locator("body")).not.toContainText(/\bvalide?s?\b/i);
-    await expect(page.getByText("Dernière étape : faire relire chez un notaire")).toBeVisible();
+    await expect(
+      page.getByText("Dernière étape (conseillée) : faire relire votre testament"),
+    ).toBeVisible();
 
     await backToHub(page);
     await fillWishes(page);
@@ -96,14 +98,14 @@ test.describe("the will journey", () => {
     ).toBeVisible();
     await expect(page.getByText("À faire voir par un professionnel").first()).toBeVisible();
     await expect(
-      page.getByText(/vous devez voir un notaire avant d'aller plus loin/),
+      page.getByText(/faites-vous accompagner par un notaire avant d'aller plus loin/),
     ).toBeVisible();
     await expect(page.getByText("Tout est complet selon notre checklist")).toHaveCount(0);
     await page.getByRole("link", { name: "Obtenir mes documents (PDF)" }).click();
     await expect(
       page.getByRole("button", { name: "Télécharger le brouillon à recopier (PDF)" }),
     ).toHaveCount(0);
-    await expect(page.getByText(/cette partie demande l'avis d'un professionnel/)).toBeVisible();
+    await expect(page.getByText(/cette partie demande l'aide d'un professionnel/)).toBeVisible();
   });
 
   test("answers are saved automatically and survive a reload and a new unlock", async ({
@@ -440,6 +442,26 @@ test.describe("understanding the journey", () => {
     await box.locator("summary").focus();
     await page.keyboard.press("Enter");
     await expect(box).not.toHaveAttribute("open", "");
+  });
+
+  test("the hub explains the forms of will and says a handwritten one needs no notary", async ({
+    page,
+  }) => {
+    await createProfile(page);
+    await openLegs(page);
+    const box = page.locator("details", { hasText: "Les formes de testament" });
+    await expect(
+      box.getByText("Écrit à la main (dit « olographe ») : celui de Veille"),
+    ).toBeVisible();
+    await expect(box.getByText(/Il n'y a pas besoin de notaire, et c'est gratuit/)).toBeVisible();
+    await expect(box.getByText("Authentique (chez le notaire)")).toBeVisible();
+    await expect(box.getByText("Mystique (rare)")).toBeVisible();
+    await expect(box.getByText(/le notaire reste facultatif/)).toBeVisible();
+    // and the permanent warning no longer suggests a notary is compulsory
+    await expect(page.getByTestId("will-disclaimer")).toContainText(
+      "Un notaire n'est pas obligatoire",
+    );
+    await expectNoViolations(page);
   });
 
   test("'Faire le point' names each missing answer by its question and links to it", async ({

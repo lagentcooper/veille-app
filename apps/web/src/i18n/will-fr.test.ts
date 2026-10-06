@@ -143,4 +143,29 @@ describe("French texts of the will journey", () => {
     }
     expect(missing).toEqual([]);
   });
+
+  it("explain the forms of will simply: the handwritten one needs no notary, and Veille targets it", () => {
+    const text = (key: string) => i18n.t(`will.explainer.forms.${key}`);
+    expect(text("handwritten.term")).toMatch(/olographe/);
+    expect(text("handwritten.text")).toMatch(/pas besoin de notaire/);
+    expect(text("handwritten.text")).toMatch(/entier de votre main.*daté|datez/);
+    expect(text("handwritten.text")).toMatch(/même valeur/);
+    expect(text("handwritten.text")).toMatch(/perdu|contesté/);
+    expect(text("authentic.text")).toMatch(/notaire/);
+    expect(text("authentic.text")).toMatch(/payant/);
+    expect(text("mystic.term")).toMatch(/Mystique/);
+    expect(text("intro")).toMatch(/écrite à la main/);
+    expect(text("notaryOptional")).toMatch(/facultatif/);
+  });
+
+  it("never present the notary as mandatory for a handwritten will", () => {
+    const mandatory =
+      /(obligatoire|vous devez voir un notaire|un notaire doit|il faut (voir )?un notaire)/i;
+    const offenders = texts
+      .filter(([, text]) => mandatory.test(text))
+      // "n'est pas obligatoire" is exactly the reassurance we want to keep.
+      .filter(([, text]) => !/pas (besoin|obligatoire)|n'est pas obligatoire/i.test(text))
+      .map(([key]) => key);
+    expect(offenders).toEqual([]);
+  });
 });

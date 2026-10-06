@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 export function Explainer({ defaultOpen = true }: { defaultOpen?: boolean }) {
   const { t } = useTranslation();
   const terms = ["testament", "legacy", "wishes"] as const;
+  const forms = ["handwritten", "authentic", "mystic"] as const;
   const here = ["draft", "wishes", "record"] as const;
   return (
     <Callout
@@ -26,6 +27,17 @@ export function Explainer({ defaultOpen = true }: { defaultOpen?: boolean }) {
           </div>
         ))}
       </dl>
+      <h2 className="will-explainer__sub">{t("will.explainer.forms.title")}</h2>
+      <p>{t("will.explainer.forms.intro")}</p>
+      <dl className="will-explainer__terms">
+        {forms.map((k) => (
+          <div key={k}>
+            <dt>{t(`will.explainer.forms.${k}.term`)}</dt>
+            <dd>{t(`will.explainer.forms.${k}.text`)}</dd>
+          </div>
+        ))}
+      </dl>
+      <p>{t("will.explainer.forms.notaryOptional")}</p>
       <h2 className="will-explainer__sub">{t("will.explainer.inVeille.title")}</h2>
       <ul className="will-explainer__here">
         {here.map((k) => (
