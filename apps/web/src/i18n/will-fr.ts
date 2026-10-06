@@ -18,7 +18,8 @@ export const willFr = {
       "Veille ne remplace pas un notaire ni un avocat : elle vous aide à vous organiser et ne donne aucun conseil juridique.",
     handwrittenFormRequired:
       "Ce que vous écrivez ici n'est pas un testament. Un testament doit être écrit en entier à la main, daté et signé par vous.",
-    consultNotary: "Faire relire votre document par un notaire est la meilleure précaution.",
+    consultNotary:
+      "Un notaire n'est pas obligatoire pour un testament écrit à la main, mais le faire relire est une bonne précaution.",
   },
 
   /**
@@ -40,6 +41,25 @@ export const willFr = {
       term: "Vos volontés hors testament",
       text: "Vos souhaits pour les obsèques, vos messages, l'endroit où sont vos papiers. C'est précieux pour vos proches, mais ce n'est pas un testament : cela ne partage pas vos biens.",
     },
+    forms: {
+      title: "Les formes de testament",
+      intro:
+        "La loi en prévoit plusieurs. Veille vous aide à préparer la plus simple : celle écrite à la main.",
+      handwritten: {
+        term: "Écrit à la main (dit « olographe ») : celui de Veille",
+        text: "Vous l'écrivez en entier de votre main, vous le datez et vous le signez. Il n'y a pas besoin de notaire, et c'est gratuit. S'il respecte ces trois règles, il a la même valeur qu'un testament fait chez un notaire. Son point faible : il peut être perdu, détruit, mal rédigé, ou plus facilement contesté.",
+      },
+      authentic: {
+        term: "Authentique (chez le notaire)",
+        text: "Le notaire l'écrit sous votre dictée, devant un second notaire ou deux témoins. Il est conservé en lieu sûr et très difficile à contester. Il est payant.",
+      },
+      mystic: {
+        term: "Mystique (rare)",
+        text: "Vous le rédigez et le signez, puis vous le remettez fermé à un notaire, devant deux témoins. Son contenu reste secret. Cette forme est peu utilisée.",
+      },
+      notaryOptional:
+        "Pour un testament écrit à la main, le notaire reste facultatif : il peut le relire, le conserver et l'inscrire au fichier central, pour que vos proches le retrouvent.",
+    },
     inVeille: {
       title: "Dans Veille",
       draft:
@@ -47,7 +67,7 @@ export const willFr = {
       wishes: "Vos volontés forment une partie à part.",
       record: "Si vous avez déjà un testament, vous indiquez seulement où il est rangé.",
     },
-    law: "Sans testament, la loi prévoit elle-même qui hérite. Et même avec un testament, elle réserve une part à certains proches : c'est pourquoi un notaire doit regarder certaines situations.",
+    law: "Sans testament, la loi prévoit elle-même qui hérite. Et même avec un testament, elle réserve une part à certains proches : c'est pourquoi, dans certaines situations, il vaut mieux se faire accompagner par un notaire.",
     footnote: "Explication générale, en langage courant. Ce n'est pas un conseil juridique.",
   },
 
@@ -60,11 +80,11 @@ export const willFr = {
     keepItSafe: "Rangez la feuille dans un endroit sûr, que vos proches pourront trouver.",
     declareItsLocation: "Indiquez ensuite dans Veille où vous l'avez rangée.",
     haveItReviewedByNotary:
-      "Idéalement, faites-la relire ou déposez-la chez un notaire : c'est la meilleure précaution.",
+      "Facultatif, mais conseillé : faites-la relire par un notaire, qui peut aussi la conserver pour vous.",
   },
 
   step: {
-    reviewWithNotary: "Dernière étape : faire relire chez un notaire",
+    reviewWithNotary: "Dernière étape (conseillée) : faire relire votre testament",
   },
 
   status: {
@@ -354,55 +374,55 @@ export const willFr = {
     },
     blocking: {
       "reserved-heirs":
-        "La loi protège une part de l'héritage pour certains proches, ce qui limite ce que vous pouvez laisser librement. Un notaire doit regarder votre situation avec vous.",
+        "La loi protège une part de l'héritage pour certains proches, ce qui limite ce que vous pouvez laisser librement. Faites-vous accompagner par un notaire.",
       "reserved-heirs_children":
-        "Vous avez des enfants. La loi leur réserve une part de votre héritage, ce qui limite ce que vous pouvez laisser librement. Un notaire doit regarder votre situation avec vous.",
+        "Vous avez des enfants. La loi leur réserve une part de votre héritage, ce qui limite ce que vous pouvez laisser librement. Faites-vous accompagner par un notaire.",
       "reserved-heirs_spouse":
-        "Vous êtes marié(e) et vous n'avez pas d'enfant. La loi peut réserver une part de votre héritage à votre conjoint, ce qui limite ce que vous pouvez laisser librement. Un notaire doit regarder votre situation avec vous.",
+        "Vous êtes marié(e) et vous n'avez pas d'enfant. La loi peut réserver une part de votre héritage à votre conjoint, ce qui limite ce que vous pouvez laisser librement. Faites-vous accompagner par un notaire.",
       "real-estate-or-business":
-        "Un bien immobilier, une entreprise, des parts de société ou une exploitation agricole se transmettent avec des règles particulières. Un notaire doit s'en occuper.",
+        "Un bien immobilier, une entreprise, des parts de société ou une exploitation agricole se transmettent avec des règles particulières. Faites-vous accompagner par un notaire.",
       "real-estate-or-business_real-estate":
-        "Vous possédez un bien immobilier. Sa transmission obéit à des règles particulières : un notaire doit s'en occuper.",
+        "Vous possédez un bien immobilier. Sa transmission obéit à des règles particulières : faites-vous accompagner par un notaire.",
       "real-estate-or-business_business":
-        "Vous possédez une entreprise, des parts de société ou une exploitation agricole. Leur transmission obéit à des règles particulières : un notaire doit s'en occuper.",
+        "Vous possédez une entreprise, des parts de société ou une exploitation agricole. Leur transmission obéit à des règles particulières : faites-vous accompagner par un notaire.",
       "foreign-element":
-        "Quand un bien, une résidence ou une nationalité est à l'étranger, plusieurs pays peuvent être concernés. Un notaire doit vous dire quelles règles s'appliquent.",
+        "Quand un bien, une résidence ou une nationalité est à l'étranger, plusieurs pays peuvent être concernés. Un notaire peut vous dire quelles règles s'appliquent.",
       "foreign-element_assets-abroad":
-        "Vous possédez un bien à l'étranger : plusieurs pays peuvent être concernés. Un notaire doit vous dire quelles règles s'appliquent.",
+        "Vous possédez un bien à l'étranger : plusieurs pays peuvent être concernés. Un notaire peut vous dire quelles règles s'appliquent.",
       "foreign-element_residence-abroad":
-        "Vous habitez hors de France : plusieurs pays peuvent être concernés. Un notaire doit vous dire quelles règles s'appliquent.",
+        "Vous habitez hors de France : plusieurs pays peuvent être concernés. Un notaire peut vous dire quelles règles s'appliquent.",
       "foreign-element_foreign-nationality":
-        "Vous avez une nationalité autre que française : plusieurs pays peuvent être concernés. Un notaire doit vous dire quelles règles s'appliquent.",
+        "Vous avez une nationalité autre que française : plusieurs pays peuvent être concernés. Un notaire peut vous dire quelles règles s'appliquent.",
       "marital-regime-pacs-or-life-insurance":
-        "Le mariage, le PACS, une donation entre époux ou une assurance-vie changent ce que vous pouvez laisser et à qui. Un notaire doit regarder votre situation avec vous.",
+        "Le mariage, le PACS, une donation entre époux ou une assurance-vie changent ce que vous pouvez laisser et à qui. Faites-vous accompagner par un notaire.",
       "marital-regime-pacs-or-life-insurance_marital-regime":
-        "Vous êtes marié(e) : votre régime matrimonial change ce que vous pouvez laisser. Un notaire doit regarder votre situation avec vous.",
+        "Vous êtes marié(e) : votre régime matrimonial change ce que vous pouvez laisser. Faites-vous accompagner par un notaire.",
       "marital-regime-pacs-or-life-insurance_pacs":
-        "Vous êtes pacsé(e) : cela change ce que vous pouvez laisser à votre partenaire et à vos autres proches. Un notaire doit regarder votre situation avec vous.",
+        "Vous êtes pacsé(e) : cela change ce que vous pouvez laisser à votre partenaire et à vos autres proches. Faites-vous accompagner par un notaire.",
       "marital-regime-pacs-or-life-insurance_spousal-donation":
-        "Vous avez fait une donation à votre conjoint : elle change ce que vous pouvez laisser. Un notaire doit regarder votre situation avec vous.",
+        "Vous avez fait une donation à votre conjoint : elle change ce que vous pouvez laisser. Faites-vous accompagner par un notaire.",
       "marital-regime-pacs-or-life-insurance_life-insurance":
-        "Une assurance-vie suit ses propres règles, en dehors de votre testament. Un notaire doit regarder votre situation avec vous.",
+        "Une assurance-vie suit ses propres règles, en dehors de votre testament. Faites-vous accompagner par un notaire.",
       "legal-entity-beneficiary":
-        "Laisser quelque chose à une association, une fondation ou un autre organisme suit des règles particulières. Un notaire doit s'en occuper.",
+        "Laisser quelque chose à une association, une fondation ou un autre organisme suit des règles particulières. Faites-vous accompagner par un notaire.",
       "minor-or-protected-person":
-        "Quand une personne est mineure ou protégée, des règles particulières s'appliquent. Un professionnel doit vous accompagner.",
+        "Quand une personne est mineure ou protégée, des règles particulières s'appliquent. Faites-vous accompagner par un professionnel.",
       "minor-or-protected-person_testator-protected":
-        "Vous êtes sous une mesure de protection : vos volontés obéissent à des règles particulières. Un professionnel doit vous accompagner.",
+        "Vous êtes sous une mesure de protection : vos volontés obéissent à des règles particulières. Faites-vous accompagner par un professionnel.",
       "minor-or-protected-person_minor-child":
-        "Vous avez un enfant de moins de 18 ans : des règles particulières le protègent. Un notaire doit vous accompagner.",
+        "Vous avez un enfant de moins de 18 ans : des règles particulières le protègent. Faites-vous accompagner par un notaire.",
       "minor-or-protected-person_minor-beneficiary":
-        "Une personne désignée a moins de 18 ans : des règles particulières la protègent. Un notaire doit vous accompagner.",
+        "Une personne désignée a moins de 18 ans : des règles particulières la protègent. Faites-vous accompagner par un notaire.",
       "blended-family":
-        "Quand les enfants sont nés d'unions différentes, le partage devient plus délicat. Un notaire doit regarder votre situation avec vous.",
+        "Quand les enfants sont nés d'unions différentes, le partage devient plus délicat. Faites-vous accompagner par un notaire.",
       "body-wishes":
         "Le don d'organes ou du corps suit des règles précises. Parlez-en à un professionnel ou à l'organisme concerné.",
       "conditional-clause":
-        "Une volonté qui dépend d'une condition ou impose une obligation doit être rédigée avec soin. Un notaire doit la rédiger avec vous.",
+        "Une volonté qui dépend d'une condition ou impose une obligation doit être rédigée avec soin. Faites-la rédiger avec un notaire.",
       "conditional-clause_condition":
-        "Une de vos volontés dépend d'une condition. Elle doit être rédigée avec soin : un notaire doit la rédiger avec vous.",
+        "Une de vos volontés dépend d'une condition. Elle doit être rédigée avec soin : faites-la rédiger avec un notaire.",
       "conditional-clause_charge":
-        "Une de vos volontés impose une obligation à la personne qui reçoit. Elle doit être rédigée avec soin : un notaire doit la rédiger avec vous.",
+        "Une de vos volontés impose une obligation à la personne qui reçoit. Elle doit être rédigée avec soin : faites-la rédiger avec un notaire.",
     },
   },
 
@@ -429,7 +449,7 @@ export const willFr = {
       incomplete:
         "Il manque des réponses. Rien de grave : il suffit de répondre aux questions listées.",
       professional:
-        "Votre situation dépend de règles que Veille ne peut pas trancher. Un notaire doit vous aider.",
+        "Votre situation dépend de règles que Veille ne peut pas trancher. Faites-vous accompagner par un notaire.",
       notStarted: "Vous n'avez pas encore ouvert cette partie.",
     },
     progress: "{{done}} réponses sur {{total}}",
@@ -447,18 +467,18 @@ export const willFr = {
     },
     blocking: {
       title: "À voir avec un professionnel",
-      hint: "Vous pouvez modifier votre réponse, mais seul un notaire peut dire ce qui est possible dans votre situation.",
+      hint: "Vous pouvez modifier votre réponse, mais Veille ne peut pas dire ce qui est possible dans votre situation : seul un notaire le peut.",
     },
     continue: "Continuer cette partie",
     notary: {
-      title: "Dernière étape : faire relire chez un notaire",
+      title: "Dernière étape (conseillée) : faire relire votre testament",
       recommended:
-        "Même quand tout est complet, la meilleure précaution est de montrer votre texte à un notaire, ou de le lui confier. Il peut aussi l'inscrire au fichier central des dispositions de dernières volontés.",
+        "Un notaire n'est pas obligatoire pour un testament écrit à la main. Mais le lui montrer est la meilleure précaution : il vérifie que tout est clair, peut le conserver et l'inscrire au fichier central des dispositions de dernières volontés, pour que vos proches le retrouvent.",
       required:
-        "Pour la partie signalée, vous devez voir un notaire avant d'aller plus loin : Veille ne peut pas vous dire ce qui est possible dans votre situation. Prenez rendez-vous, et emportez ces informations.",
+        "Pour la partie signalée, Veille ne peut pas vous guider seule : faites-vous accompagner par un notaire avant d'aller plus loin. Une erreur de rédaction pourrait empêcher votre volonté d'être appliquée.",
     },
     blockedExport:
-      "Le texte à recopier ne peut pas être préparé tant qu'une situation demande un professionnel.",
+      "Le texte à recopier n'est pas proposé tant qu'une situation demande l'aide d'un professionnel.",
     toExport: "Obtenir mes documents (PDF)",
     toHub: "Retour à mon document de legs",
   },
@@ -481,7 +501,7 @@ export const willFr = {
     },
     notAvailable:
       "Ce document n'est pas disponible tant que cette partie n'est pas complète selon notre checklist.",
-    blocked: "Ce document n'est pas disponible : cette partie demande l'avis d'un professionnel.",
+    blocked: "Ce document n'est pas disponible : cette partie demande l'aide d'un professionnel.",
     seeReview: "Voir ce qui manque",
     done: "Document préparé. Il a été enregistré dans l'historique des versions.",
   },

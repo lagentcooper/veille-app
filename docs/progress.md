@@ -240,3 +240,9 @@ le porteur a restreint le POC au seul document de legs.*
   - Le PDF est en Courier (police intégrée) : lisible, mais non « tagué » pour les lecteurs d'écran.
   - La mesure « moins de 15 minutes sans aide » ne peut être démontrée que par les tests utilisateurs ;
     l'E2E ne mesure que la longueur du parcours (nombre d'écrans).
+- **Testament écrit à la main et notaire** (session Web, `feature/will-poc`) : l'application précise
+  désormais qu'un testament olographe n'exige pas de notaire (le notaire reste conseillé : relecture,
+  conservation, fichier central) et présente les trois formes (olographe, authentique, mystique) et leur
+  valeur, en langage courant, dans l'encart du hub. Les textes des cas bloquants ne disent plus « un
+  notaire doit… » mais « faites-vous accompagner par un notaire » : c'est une limite de Veille, pas une
+  obligation légale. ⚖️ À faire relire par un juriste (`will.explainer.forms.*`).
