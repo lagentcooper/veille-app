@@ -1,7 +1,7 @@
 # Current Progress
 
 > Mis à jour à chaque tâche significative. **Aucune donnée personnelle, aucun secret ici.**
-> Dernière mise à jour : 2026-10-06 — session *Web/UX* (Session A, `feature/poc-shell`).
+> Dernière mise à jour : 2026-10-06 — sessions *Web* (C), *QA* et *UX/UI*, intégrées ensemble.
 
 ## Completed
 
@@ -55,6 +55,74 @@
   - Workflows : `ci.yml` (lint, types, unitaires, build, E2E) et `deploy-pages.yml` (déploiement sur
     `main` puis E2E rejoués **contre l'URL Pages**).
 
+- **Session B — domaine legs** (`feature/will-domain`, mergée dans `pre`) : `packages/core/src/will/**`,
+  trois objets distincts, versions chaînées par hash, moteur de complétude à trois niveaux, neuf cas
+  bloquants, validation d'entrée stricte, sérialisation VEA du legs. 97 tests.
+
+- **Session C — parcours Legs** (branche `feature/will-poc`, PR vers `pre`)
+  - **Completed** : assistant pas-à-pas **une question par écran** (brouillon : 13 à 20 écrans selon les
+    réponses ; volontés ; emplacement du testament manuscrit), sauvegarde automatique à chaque saisie,
+    reprise là où l'on s'était arrêté, écran « Faire le point » (✅ / ⚠️ / 🛑, orientation vers le notaire
+    présentée comme la dernière étape), export de **deux PDF distincts** (jamais fusionnés), historique
+    des versions consultable, avertissement permanent et non masquable sur tous les écrans `/legs`.
+  - **Chiffrement réel** : AES-256-GCM, une DEK par objet, DEK enveloppée par la KEK (Argon2id, jamais
+    persistée), sujet authentifié (AAD) : un enregistrement déplacé est refusé ; l'historique est
+    revérifié (chaîne de hash) à chaque lecture ; un enregistrement illisible n'est jamais écrasé.
+  - **Current State** : tout est local ; aucune requête réseau pendant le parcours (test E2E).
+  - **Files Changed** : `apps/web/src/features/will/**` (domain, data, ui), `apps/web/src/i18n/will-fr.ts`,
+    `apps/web/src/adapters/sha256-hasher.ts`, `apps/web/e2e/will*.ts`, `packages/ui` (ChoiceGroup,
+    TextArea, Checkbox, Progress, style des liens-boutons), alias `@veille/core/will`, petites retouches
+    à `App.tsx`, `main.tsx`, `HomeScreen.tsx`, `profile-service.ts` (export de `KEK_ALIAS`).
+    Docs : threat model (R31), classification (PDF exportés), matrice de tests.
+  - **Decisions** : (1) PDF sans dépendance, écrit à la main (texte, polices Courier intégrées au
+    format PDF) — une dépendance de moins à auditer ; (2) le texte à recopier n'est **pas** proposé tant
+    qu'un cas 🛑 ou une information manquante subsiste ; (3) une version est enregistrée quand on termine
+    une partie et à chaque export, pas à chaque frappe ; (4) le contenu d'un PDF téléchargé sort du
+    périmètre chiffré : avertissement affiché (R31).
+  - **Tests** : 130 tests unitaires/composants `@veille/web` + 8 `@veille/ui` ; E2E Playwright (voir PR) ;
+    mutation vérifiée : remplacer le chiffrement par du clair fait échouer le test de stockage.
+  - **Known Issues** : voir « Known Issues » ci-dessous (domaine legs, CI, juridique).
+  - **Next Action** : tests utilisateurs du parcours (≥ 5 personnes dont ≥ 2 de plus de 65 ans) ; faire
+    relire par un juriste les textes marqués ⚖️ (`apps/web/src/i18n/will-fr.ts`).
+
+- **Contraste des boutons — correctif** (session *UX/UI*, branche `fix/disabled-contrast`)
+  - **Cause réelle de la CI rouge** (`will.spec.ts:353`, ligne 377, écran « ajouter un message ») : la
+    transition `background-color 0,15 s` des boutons. React réutilise le même `<button>` d'un écran à
+    l'autre en changeant sa variante (primaire → secondaire) ; l'audit axe, lancé pendant ces 150 ms,
+    mesure un fond à moitié fondu : **2,76:1** (`#1f4e8c` sur `#7b97bc`) dans le log de CI. Reproduit en
+    allongeant la transition à 8 s (1,04:1 sur ce même écran). Transition supprimée.
+  - `opacity: 0.6` des boutons désactivés remplacé par des jetons explicites : blanc sur `#646b78`
+    (5,36:1) pour le primaire ; `#5d6475` sur blanc (5,92:1) et sur surface (5,39:1) pour le secondaire.
+    `aria-disabled` conservé, survol neutralisé. Champ désactivé aligné.
+  - Gardes : `packages/ui/tests/tokens.test.ts` (ratios ≥ 4,5:1, aucune `opacity`, aucune `transition`)
+    et un E2E sur la durée de transition des boutons.
+
+- **Câblage de `packages/core` et hygiène** (session *QA*, branche `fix/core-workspace-wiring`)
+  - **Les 97 cas du domaine legs n'étaient exécutés par rien.** `packages/core` n'avait pas de
+    `package.json`, donc n'était pas un paquet du workspace, donc n'avait pas de script `test` ;
+    la CI listait `@veille/ui` et `@veille/web` à la main. Les 20 cas bloquants juridiques
+    (réservataires, immobilier, extranéité, régime matrimonial, majeur protégé, personne morale,
+    famille recomposée, clause conditionnelle) n'étaient assertés par aucun test exécuté.
+  - `packages/core` devient `@veille/core`, avec une carte `exports` sur la source — pas d'étape de
+    build : Vite et `tsc` lisent le `.ts` directement, comme `@veille/ui` le fait déjà.
+  - `apps/web` déclare `@veille/core` en `workspace:*` et **l'alias disparaît des quatre endroits**
+    qui le portaient (`tsconfig.base.json`, `apps/web/tsconfig.json`, `vite.config.ts`,
+    `vitest.config.ts`). Un seul mécanisme. La session C peut importer `@veille/core/will` sans
+    toucher à une configuration.
+  - La CI exécute `pnpm test` (Turborepo) au lieu d'une liste de filtres : un nouveau paquet est
+    couvert le jour où il est créé.
+  - Typecheck **étendu, pas dupliqué** : `tsconfig.core.json` garde la source sous `types: []`,
+    `tsconfig.core-tests.json` l'étend pour couvrir les tests avec `@types/node`. Aucun fichier
+    couvert deux fois ; `packages/core` n'a toujours pas de `tsconfig` propre.
+  - `packages/core` passe sous Prettier (la note `//format` du `package.json` racine est levée).
+    Au passage : le test de pureté du domaine ne reconnaissait que les quotes simples — le
+    reformatage l'aurait rendu **vacu** (assertions sur zéro import, toujours vertes). Rendu
+    insensible aux quotes, avec une assertion qui garde le garde-fou.
+  - **52 artefacts Playwright (1,3 Mo) retirés du suivi Git** : traces, enregistrements réseau,
+    capture vidéo, instantanés DOM des pages testées. `test-results/`, `playwright-report/` et
+    `.playwright-artifacts-*/` ajoutés à `.gitignore`. Données fictives ici, mais c'est l'habitude
+    qu'interdit AGENTS.md §10.
+
 ## In Progress
 
 - **Phase 1 — POC UX/UI en PWA.** Phase ouverte : l'architecture est validée (D22) et la plateforme
@@ -99,8 +167,9 @@ critères de fin — dans [`docs/product/05-briefs-sessions.md`](product/05-brie
 2. **Session B — `feature/will-domain`**, en parallèle de A (aucun fichier partagé) : règles métier du
    legs en TypeScript pur — `WillDraft` / `WishesDocument` / `PhysicalWillRecord`, versions immuables,
    moteur de complétude, cas bloquants « voir un notaire », sérialisation VEA.
-3. **Session C — `feature/will-poc`**, après merge de A et B : assemblage des écrans du parcours de
-   legs, chiffrement WebCrypto réel, deux PDF distincts, E2E Playwright.
+3. ~~**Session C — `feature/will-poc`**~~ : livrée et fusionnée dans `pre`.
+   Le câblage de `@veille/core` est en place (session *QA*) : `import { ... } from "@veille/core/will"`
+   fonctionne sans configuration, et les tests du domaine s'exécutent en CI.
 4. **Tests utilisateurs du parcours de legs** (≥ 5 personnes dont ≥ 2 de plus de 65 ans) — c'est
    l'objet même de la Phase 1. **Ne pas ouvrir d'autre chantier avant.**
 5. Trancher les décisions 🔴 restantes (D1, D2, D3, D8, D9, D25). **D2 tranchée** : option (c), trois
@@ -132,3 +201,22 @@ le porteur a restreint le POC au seul document de legs.*
 - Les deux conflits signalés précédemment par la session QA (incohérence de phase dans `AGENTS.md` §2,
   et piste PWA contredisant ADR-0002) sont **résolus** : le porteur a tranché, la documentation est
   alignée et ADR-0011 porte la décision.
+- **Trou de couverture confirmé**, détaillé dans
+  [`09-strategie-tests.md`](architecture/09-strategie-tests.md) §11.2 bis : le critère de Phase 1
+  « **aucune PII dans les logs** » (roadmap, AGENTS.md §6.3) n'est asserté par **aucun** test —
+  `console-logger.ts` n'est couvert par rien et il n'existe pas de scanner de motifs. À produire
+  avant les tests utilisateurs. Également ouverts : assertions d'octets sur le stockage chiffré,
+  et Playwright sur Chromium seulement là où la matrice vise aussi WebKit.
+- **Leçon de méthode** : un paquet livré sans `package.json` est invisible pour le workspace, donc
+  ses tests ne s'exécutent pas, et une CI qui nomme ses paquets à la main ne le signale jamais.
+  La CI appelle désormais `pnpm test`. Toute session qui crée un paquet doit vérifier qu'il
+  apparaît dans la sortie de `pnpm test` — pas seulement que ses tests passent en local.
+- **Parcours legs — points à traiter, non corrigés par la session C (hors de son périmètre)** :
+    distingue pas « pas encore répondu » de « ne sait pas ». À arbitrer (produit + domaine).
+  - Marié sans enfant : deux 🛑 pour la même personne (héritier réservataire *et* régime matrimonial).
+  - L'avertissement « mot de passe » ne couvre ni l'intitulé des papiers ni la description des volontés.
+  - ⚖️ Les textes en langage courant (cas bloquants, mode d'emploi manuscrit, formule d'ouverture du
+    texte à recopier, avertissements) n'ont **pas** été relus par un juriste.
+  - Le PDF est en Courier (police intégrée) : lisible, mais non « tagué » pour les lecteurs d'écran.
+  - La mesure « moins de 15 minutes sans aide » ne peut être démontrée que par les tests utilisateurs ;
+    l'E2E ne mesure que la longueur du parcours (nombre d'écrans).

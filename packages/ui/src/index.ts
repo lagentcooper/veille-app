@@ -4,3 +4,7 @@ export { Card } from "./Card";
 export { ConfirmDialog, type ConfirmDialogProps } from "./ConfirmDialog";
 export { Stepper, type StepperProps } from "./Stepper";
 export { TextField, type TextFieldProps } from "./TextField";
+export { Checkbox, type CheckboxProps } from "./Checkbox";
+export { ChoiceGroup, type ChoiceGroupProps, type ChoiceOption } from "./ChoiceGroup";
+export { Progress, type ProgressProps } from "./Progress";
+export { TextArea, type TextAreaProps } from "./TextArea";

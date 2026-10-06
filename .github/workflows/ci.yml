@@ -30,8 +30,9 @@ jobs:
       - run: pnpm lint
       - run: pnpm lint:isolation
       - run: pnpm typecheck
-      - run: pnpm --filter @veille/ui test
-      - run: pnpm --filter @veille/web test
+      # Every workspace package that declares a `test` script, so a new package is covered the
+      # day it is added instead of the day someone remembers to list it here.
+      - run: pnpm test
       - run: pnpm --filter @veille/web build
 
       - name: Install the Playwright browser

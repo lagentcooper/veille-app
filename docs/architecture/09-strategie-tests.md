@@ -29,9 +29,9 @@ les tests de `packages/core`, eux, ne changent pas — ils ne dépendent d'aucun
 | Fonctionnalité | Unit | Integration | E2E | Security | Privacy |
 |----------------|------|-------------|-----|----------|---------|
 | Profil local / verrouillage | ✅ règles de session | ✅ dérivation et détention de la KEK | ✅ création + verrouillage | ✅ verrouillage à la perte de visibilité, échecs de code, **KEK jamais persistée** | ✅ aucune donnée hors appareil |
-| Document de legs — rédaction | ✅ complétude, cohérence | ✅ persistance chiffrée | ✅ parcours complet | ⚪ | ✅ pas de log de contenu |
-| Document de legs — validation | ✅ **règles de blocage (notaire requis)** | ✅ | ✅ écran de contrôle | ⚪ | ⚪ |
-| Historique des versions | ✅ immuabilité, hash | ✅ | ✅ consultation | ✅ non-altérabilité | ⚪ |
+| Document de legs — rédaction | ✅ complétude, cohérence, enchaînement des écrans — *en place, `@veille/core`* | ✅ persistance chiffrée (AES-256-GCM, DEK par document, sujet authentifié) | ✅ parcours complet | ✅ **aucun texte en clair** dans IndexedDB/OPFS/Web Storage/cache, **KEK introuvable** dans le stockage (E2E) | ✅ pas de log de contenu |
+| Document de legs — validation | ✅ **règles de blocage (notaire requis)** — *en place, 20 cas* | ✅ | ✅ écran de contrôle, PDF refusé si 🛑 | ⚪ | ✅ avertissement sur les PDF en clair (R31) |
+| Historique des versions | ✅ immuabilité, hash — *en place* | ✅ | ✅ consultation | ✅ non-altérabilité | ⚪ |
 | Import de document | ✅ validation de type/taille | ✅ chiffrement effectif | ✅ photo + fichier | ✅ **fichier malveillant, chemin, taille** | ✅ pas de nom de fichier logué |
 | Consultation / recherche | ✅ filtres | ✅ index | ✅ trouver en < 15 s | ✅ pas d'accès hors périmètre | ⚪ |
 | Suppression | ✅ cascade (dérivés, index, OCR) | ✅ **contenu illisible après suppression** | ✅ | ✅ suppression cryptographique | ✅ pas de résidu |
@@ -44,6 +44,50 @@ les tests de `packages/core`, eux, ne changent pas — ils ne dépendent d'aucun
 | Migrations | ✅ | ✅ N→N+1 sur données figées | ⚪ | ⚪ | ⚪ |
 
 ✅ = obligatoire · ⚪ = non pertinent à ce niveau
+
+La matrice décrit la **cible**. Le POC de Phase 1 étant restreint au seul document de legs, les
+lignes *Import de document*, *Consultation / recherche*, *Assistant IA*, *Contact de confiance* et
+*Consentements* sont hors périmètre immédiat : elles ne sont pas « en retard », elles ne sont pas
+encore ouvertes. Ce qui est réellement exécuté aujourd'hui est ci-dessous.
+
+---
+
+## 11.2 bis État réel de l'exécution
+
+> Mis à jour par la session *QA* le 2026-10-06. **Cette section énonce des faits vérifiables, pas
+> des intentions** : toute ligne doit être reproductible par la commande indiquée.
+
+Porte d'entrée unique : **`pnpm test` à la racine** (Turborepo), qui exécute chaque paquet du
+workspace déclarant un script `test`. La CI appelle cette commande et non une liste de filtres
+tenue à la main, afin qu'un nouveau paquet soit couvert dès sa création.
+
+| Paquet | Commande | Cas | Couvre |
+|--------|----------|-----|--------|
+| `@veille/core` | `vitest run` | **97** | Domaine legs : complétude, cas bloquants, versions immuables, canonicalisation, parse, VEA, purité du domaine |
+| `@veille/web` | `vitest run` | 57 | Politiques de session, adapters (IndexedDB, WebCrypto), service d'enregistrement du profil, coquille et verrouillage |
+| `@veille/ui` | `vitest run` | 5 | Composants du design system + `axe` |
+| `@veille/config` | `node --test` | 6 | Règle ESLint d'isolation de `packages/core` (échoue sur `window`, `document`, `indexedDB`, `crypto`, `react`) |
+| `@veille/web` (E2E) | `playwright test` | **20** | Parcours de la coquille, clavier seul, cibles ≥ 48 px, manifeste et portée du service worker, **hors ligne après premier chargement**, **aucune requête sortante après chargement**, **toutes les requêtes du premier chargement sur l'origine**, CSP sans `unsafe-inline`/`unsafe-eval`, aucun script ou feuille tiers, état réel de la persistance, suppression effective |
+
+Typecheck : `pnpm typecheck`. Celui de `packages/core` appartient à `@veille/config`, qui exécute
+`tsconfig.core.json` (source, sous `types: []` — un global navigateur n'y typecheck même pas) puis
+`tsconfig.core-tests.json` (tests, avec `@types/node`). `packages/core` n'a pas de `tsconfig` propre :
+un seul propriétaire par ensemble de fichiers.
+
+**Trous connus, à combler par les sessions concernées** (énoncés ici pour qu'ils ne soient pas
+découverts plus tard) :
+
+- Les tests **Integration** de la matrice (chiffrement effectif sur IndexedDB/OPFS, contenu illisible
+  après suppression) sont couverts côté adapters mais pas encore comme assertions d'octets sur le
+  stockage réel.
+- **Privacy — aucun test.** Le critère de Phase 1 « aucune PII dans les logs » n'est asserté par
+  rien : `apps/web/src/adapters/console-logger.ts` n'est couvert par aucun test, et il n'existe
+  aucun scanner de motifs (email, IBAN, téléphone, NIR). C'est un critère d'acceptation de la
+  phase (roadmap) et la règle AGENTS.md §6.3 : **à produire avant les tests utilisateurs.**
+- Playwright ne tourne que sur **Chromium** ; la matrice vise Chromium + WebKit.
+- Le critère « aucune requête sortante » **est** couvert (E2E, trois tests), contrairement à ce que
+  laissait craindre l'absence de la ligne correspondante dans la matrice : la lacune était dans la
+  documentation, pas dans les tests.
 
 ---
 

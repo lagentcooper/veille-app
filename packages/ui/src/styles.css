@@ -21,6 +21,12 @@
   --v-color-danger: #a31919;
   --v-color-success-bg: #e3f4e8;
   --v-color-success-text: #124b24;
+  /* Disabled controls stay readable (WCAG 1.4.3 AA, >= 4.5:1) and read as inactive by being grey, not by
+     being faded: `opacity` would blend text and background with whatever is behind. */
+  --v-color-disabled-bg: #646b78; /* white on it: 5.36:1 */
+  --v-color-on-disabled: #ffffff;
+  --v-color-disabled-text: #5d6475; /* on white: 5.92:1, on --v-color-surface: 5.39:1 */
+  --v-color-disabled-border: #8a90a0;
   --v-color-banner-bg: #5b3a00;
   --v-color-banner-text: #ffffff;
 
@@ -130,10 +136,24 @@ p {
 .v-button--block {
   width: 100%;
 }
+/* Disabled: aria-disabled is kept (the control stays in the keyboard order for screen readers),
+   so both selectors are styled identically. Hover must not change a disabled control. */
 .v-button[aria-disabled="true"],
-.v-button:disabled {
-  opacity: 0.6;
+.v-button:disabled,
+.v-button[aria-disabled="true"]:hover,
+.v-button:disabled:hover {
+  background: var(--v-color-disabled-bg);
+  border-color: var(--v-color-disabled-bg);
+  color: var(--v-color-on-disabled);
   cursor: not-allowed;
+}
+.v-button--secondary[aria-disabled="true"],
+.v-button--secondary:disabled,
+.v-button--secondary[aria-disabled="true"]:hover,
+.v-button--secondary:disabled:hover {
+  background: var(--v-color-bg);
+  border-color: var(--v-color-disabled-border);
+  color: var(--v-color-disabled-text);
 }
 
 /* Field */
@@ -166,6 +186,11 @@ p {
   letter-spacing: 0.4em;
   text-align: center;
   font-variant-numeric: tabular-nums;
+}
+.v-field__input:disabled {
+  background: var(--v-color-surface);
+  color: var(--v-color-disabled-text);
+  cursor: not-allowed;
 }
 .v-field__input[aria-invalid="true"] {
   border-color: var(--v-color-danger);
@@ -255,8 +280,76 @@ p {
   margin-top: var(--v-space-4);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .v-button {
-    transition: background-color 0.15s ease;
-  }
+/* Text area */
+.v-field__input--area {
+  resize: vertical;
+  line-height: var(--v-line-height);
+}
+
+/* Choice group (radio buttons, checkbox) */
+.v-choice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--v-space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+.v-choice__legend {
+  padding: 0;
+  margin-bottom: var(--v-space-2);
+  font-weight: 600;
+}
+.v-choice__option {
+  display: flex;
+  align-items: center;
+  gap: var(--v-space-3);
+  min-height: var(--v-target-min);
+  padding: var(--v-space-2) var(--v-space-3);
+  border: 0.125rem solid var(--v-color-border);
+  border-radius: var(--v-radius);
+  background: var(--v-color-bg);
+  cursor: pointer;
+}
+.v-choice__option:has(input:checked) {
+  border-color: var(--v-color-primary);
+  background: var(--v-color-info-bg);
+}
+.v-choice__option input {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  accent-color: var(--v-color-primary);
+}
+
+/* Progress */
+.v-progress {
+  margin-bottom: var(--v-space-3);
+}
+.v-progress__text {
+  margin-bottom: var(--v-space-1);
+  color: var(--v-color-text-muted);
+  font-size: var(--v-font-size-small);
+}
+.v-progress__bar {
+  display: block;
+  width: 100%;
+  height: 0.75rem;
+  accent-color: var(--v-color-primary);
+}
+
+/* No colour transition on buttons. React reuses the same <button> between two screens while its
+   variant changes (primary -> secondary); a transition then leaves a half-blended background for
+   150 ms, and an accessibility audit run in that window measures a false contrast failure
+   (CI: 2.76:1, #1f4e8c on #7b97bc). A flash of colour is also worse for this audience. */
+
+/* A link that looks like a button must keep the button colours over the generic link colour. */
+a.v-button {
+  color: var(--v-color-on-primary);
+  text-decoration: none;
+}
+a.v-button--secondary {
+  color: var(--v-color-primary);
 }

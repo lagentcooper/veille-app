@@ -152,6 +152,15 @@ test.describe("accessibility", () => {
     expect(outline).not.toBe("none");
   });
 
+  test("buttons have no colour transition, so an audit never measures a half-blended background", async ({
+    page,
+  }) => {
+    const duration = await page
+      .getByRole("button", { name: "Commencer" })
+      .evaluate((el) => getComputedStyle(el).transitionDuration);
+    expect(duration).toBe("0s");
+  });
+
   test("targets are at least 48px and text follows the browser font size", async ({ page }) => {
     const button = page.getByRole("button", { name: "Commencer" });
     const box = await button.boundingBox();

@@ -7,13 +7,13 @@ export function canonicalJson(value: unknown, indent?: number): string {
 }
 
 function sortKeys(value: unknown): unknown {
-  if (value === null || typeof value === 'string' || typeof value === 'boolean') return value;
-  if (typeof value === 'number') {
-    if (!Number.isFinite(value)) throw new TypeError('canonicalJson: non-finite number');
+  if (value === null || typeof value === "string" || typeof value === "boolean") return value;
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) throw new TypeError("canonicalJson: non-finite number");
     return value;
   }
   if (Array.isArray(value)) return value.map((v) => (v === undefined ? null : sortKeys(v)));
-  if (typeof value === 'object') {
+  if (typeof value === "object") {
     const out: Record<string, unknown> = {};
     for (const key of Object.keys(value as object).sort()) {
       const v = (value as Record<string, unknown>)[key];
@@ -25,7 +25,7 @@ function sortKeys(value: unknown): unknown {
 }
 
 export function deepFreeze<T>(value: T): T {
-  if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
+  if (value !== null && typeof value === "object" && !Object.isFrozen(value)) {
     Object.freeze(value);
     for (const v of Object.values(value as object)) deepFreeze(v);
   }
