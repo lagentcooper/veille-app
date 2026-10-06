@@ -24,7 +24,8 @@ import { fromBase64, toBase64 } from "./bytes";
 
 const COLLECTION = "profile";
 const KEY = "main";
-const KEK_ALIAS = "kek";
+/** Alias of the unlocked KEK in the key store; other features wrap their data keys under it. */
+export const KEK_ALIAS = "kek";
 const AAD = new TextEncoder().encode("veille.profile.v1");
 
 /** Argon2id, single-threaded (no SharedArrayBuffer on GitHub Pages — ADR-0012). To be calibrated on device. */

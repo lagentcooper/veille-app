@@ -1,5 +1,8 @@
+import { willFr } from "./will-fr";
+
 /** French UI texts. Components reference keys only (AGENTS.md §4). */
 export const fr = {
+  will: willFr,
   app: {
     skipToContent: "Aller au contenu",
     loading: "Chargement…",
@@ -65,7 +68,11 @@ export const fr = {
   home: {
     title: "Bonjour {{name}}",
     ready: "Votre espace est ouvert et protégé par votre code.",
-    soon: "La rédaction de votre document de volontés arrive bientôt. Pour l'instant, vous pouvez vérifier où se trouvent vos données.",
+    legs: "Mon document de legs",
+    legsBody:
+      "Préparez votre brouillon de testament, vos volontés, et notez où se trouve votre testament écrit à la main.",
+    legsOpen: "Ouvrir",
+    soon: "Vous pouvez aussi vérifier où se trouvent vos données.",
     lock: "Verrouiller",
     whereData: "Où sont mes données ?",
     autoLock:

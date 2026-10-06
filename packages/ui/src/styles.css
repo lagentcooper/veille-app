@@ -255,8 +255,77 @@ p {
   margin-top: var(--v-space-4);
 }
 
+/* Text area */
+.v-field__input--area {
+  resize: vertical;
+  line-height: var(--v-line-height);
+}
+
+/* Choice group (radio buttons, checkbox) */
+.v-choice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--v-space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+.v-choice__legend {
+  padding: 0;
+  margin-bottom: var(--v-space-2);
+  font-weight: 600;
+}
+.v-choice__option {
+  display: flex;
+  align-items: center;
+  gap: var(--v-space-3);
+  min-height: var(--v-target-min);
+  padding: var(--v-space-2) var(--v-space-3);
+  border: 0.125rem solid var(--v-color-border);
+  border-radius: var(--v-radius);
+  background: var(--v-color-bg);
+  cursor: pointer;
+}
+.v-choice__option:has(input:checked) {
+  border-color: var(--v-color-primary);
+  background: var(--v-color-info-bg);
+}
+.v-choice__option input {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  accent-color: var(--v-color-primary);
+}
+
+/* Progress */
+.v-progress {
+  margin-bottom: var(--v-space-3);
+}
+.v-progress__text {
+  margin-bottom: var(--v-space-1);
+  color: var(--v-color-text-muted);
+  font-size: var(--v-font-size-small);
+}
+.v-progress__bar {
+  display: block;
+  width: 100%;
+  height: 0.75rem;
+  accent-color: var(--v-color-primary);
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .v-button {
     transition: background-color 0.15s ease;
   }
+}
+
+/* A link that looks like a button must keep the button colours over the generic link colour. */
+a.v-button {
+  color: var(--v-color-on-primary);
+  text-decoration: none;
+}
+a.v-button--secondary {
+  color: var(--v-color-primary);
 }

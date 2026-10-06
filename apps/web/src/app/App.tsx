@@ -8,9 +8,22 @@ import { WelcomeScreen } from "../features/profile/ui/WelcomeScreen";
 import { DataLocationScreen } from "../features/shell/ui/DataLocationScreen";
 import { EvaluationBanner } from "../features/shell/ui/EvaluationBanner";
 import { HomeScreen } from "../features/shell/ui/HomeScreen";
+import { WillWorkspaceProvider, type WillServices } from "../features/will/ui/WillWorkspace";
+import { WillRoutes } from "../features/will/ui/WillRoutes";
 import type { UpdateHandle } from "../pwa/register-sw";
 import { useSession } from "./session";
 import { useAutoLock } from "./use-auto-lock";
+
+/** The will journey only exists while the application is unlocked: no key, no content. */
+function LegsGate({ will }: { will: WillServices }) {
+  const { state } = useSession();
+  if (state.status !== "unlocked") return <Gate />;
+  return (
+    <WillWorkspaceProvider {...will}>
+      <WillRoutes />
+    </WillWorkspaceProvider>
+  );
+}
 
 function Gate() {
   const session = useSession();
@@ -34,7 +47,7 @@ function Gate() {
   }
 }
 
-export function App({ update }: { update: UpdateHandle | null }) {
+export function App({ update, will }: { update: UpdateHandle | null; will: WillServices }) {
   const session = useSession();
   const { t } = useTranslation();
   useAutoLock(session.state.status === "unlocked", session.lock);
@@ -64,6 +77,7 @@ export function App({ update }: { update: UpdateHandle | null }) {
               />
             }
           />
+          <Route path="/legs/*" element={<LegsGate will={will} />} />
           <Route path="*" element={<Gate />} />
         </Routes>
       </main>
