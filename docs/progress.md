@@ -1,7 +1,7 @@
 # Current Progress
 
 > Mis à jour à chaque tâche significative. **Aucune donnée personnelle, aucun secret ici.**
-> Dernière mise à jour : 2026-09-14 — session *QA*.
+> Dernière mise à jour : 2026-10-06 — session *Architecture*.
 
 ## Completed
 
@@ -40,7 +40,11 @@
 ## In Progress
 
 - **Phase 1 — POC UX/UI en PWA.** Phase ouverte : l'architecture est validée (D22) et la plateforme
-  tranchée (D16). Prochaine étape : session *Setup* (squelette `apps/web` + CI toolchain).
+  tranchée (D16).
+- **Périmètre restreint par le porteur : le POC porte UNIQUEMENT sur le document de legs.**
+  Documents justificatifs, contact de confiance, assistant IA et export VEA complet sont **hors
+  périmètre** jusqu'à ce que le parcours de legs ait été testé auprès d'utilisateurs réels.
+  Briefs des sessions : [`docs/product/05-briefs-sessions.md`](product/05-briefs-sessions.md).
 
 ## Blocked
 
@@ -61,18 +65,26 @@ confiance, qualification du responsable de traitement en Phase 1.
 
 ## Next Steps
 
-1. Session *Setup* : squelette du monorepo (pnpm + Turborepo + TypeScript strict), `apps/web`
-   (React + Vite + service worker), CI toolchain (lint, typecheck, tests), règle ESLint interdisant
-   à `packages/core` d'importer React ou une API navigateur.
-2. Sessions *Legs* et *Trusted Contact* — **démarrables en parallèle dès maintenant** : elles ne
-   touchent que `packages/core`, en TypeScript pur, indépendant de la plateforme. Règles de
-   complétude et cas bloquants d'une part ; machine à états de l'activation et tests exhaustifs
-   (transitions illégales comprises) d'autre part.
-3. Session *UX/UI* : design system et maquettes des 8 parcours (`packages/ui`), accessibilité DOM.
-4. Session *Web* : assemblage des parcours dans `apps/web`.
-5. Session *QA* : Playwright, test hors ligne, assertion « aucune requête sortante », vérification CSP,
-   et tenue de la matrice de tests.
-6. Trancher les décisions 🔴 restantes (D1, D2, D3, D8, D9, D25).
+Les trois sessions ci-dessous sont décrites intégralement — périmètre de fichiers, interdits,
+critères de fin — dans [`docs/product/05-briefs-sessions.md`](product/05-briefs-sessions.md).
+
+1. **Session A — `feature/poc-shell`** : squelette du monorepo (pnpm + Turborepo + TypeScript strict),
+   `apps/web` (React + Vite + service worker + CSP stricte), design system `packages/ui`, coquille
+   (accueil, verrouillage par code, bandeau « version d'évaluation », écran « Où sont mes données ? »),
+   ports dans `packages/core`, règle ESLint interdisant à `packages/core` d'importer React ou une API
+   navigateur.
+2. **Session B — `feature/will-domain`**, en parallèle de A (aucun fichier partagé) : règles métier du
+   legs en TypeScript pur — `WillDraft` / `WishesDocument` / `PhysicalWillRecord`, versions immuables,
+   moteur de complétude, cas bloquants « voir un notaire », sérialisation VEA.
+3. **Session C — `feature/will-poc`**, après merge de A et B : assemblage des écrans du parcours de
+   legs, chiffrement WebCrypto réel, deux PDF distincts, E2E Playwright.
+4. **Tests utilisateurs du parcours de legs** (≥ 5 personnes dont ≥ 2 de plus de 65 ans) — c'est
+   l'objet même de la Phase 1. **Ne pas ouvrir d'autre chantier avant.**
+5. Trancher les décisions 🔴 restantes (D1, D2, D3, D8, D9, D25). **D2 tranchée** : option (c), trois
+   objets distincts (brouillon de testament à recopier, document de volontés, emplacement déclaré).
+
+*La session Trusted Contact, précédemment annoncée comme démarrable en parallèle, est reportée :
+le porteur a restreint le POC au seul document de legs.*
 7. En parallèle : prise de contact avec un juriste (points ⚖️) et recrutement des testeurs.
 8. **Réglages GitHub restant à la charge du porteur** : protection de `main` et `pre`, secret
    scanning + push protection, CODEOWNERS (identifiants réels requis).

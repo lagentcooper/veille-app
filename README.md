@@ -54,6 +54,7 @@ Le chat n'est jamais la source de vérité : **Git, le code, les tests, la docum
 | [Contraintes juridiques](docs/product/02-contraintes-juridiques.md) | Testament, rôles, fraude, RGPD, AI Act — ⚖️ à valider |
 | [Roadmap](docs/product/03-roadmap.md) | Phases 0 à 6 : objectifs, livrables, critères, risques, ce qu'il ne faut PAS faire |
 | [Décisions à prendre](docs/product/04-decisions-a-prendre.md) | D1 à D25, avec recommandations |
+| [Briefs de sessions](docs/product/05-briefs-sessions.md) | Missions A/B/C du POC legs, collables à l'ouverture d'une session |
 
 ### Architecture
 | Document | Contenu |
