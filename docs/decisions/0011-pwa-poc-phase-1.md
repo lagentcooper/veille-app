@@ -101,9 +101,14 @@ décision, pas une précaution de style.
   par Playwright (`docs/architecture/09-strategie-tests.md`).
 - Le test « aucune requête réseau » est redéfini : l'application étant servie par HTTP, l'assertion
   porte sur **l'absence de toute requête après le chargement initial**, hors assets de même origine.
-- Hébergement du POC : statique, dans l'UE, sans analytique, sans CDN tiers. Cela ne contredit pas
+- Hébergement du POC : statique, sans analytique, et **aucune dépendance servie par un CDN tiers**
+  (tout est bundlé et servi par l'origine). Cela ne contredit pas
   [ADR-0007](0007-pas-de-backend-phase-1.md) : servir des fichiers n'est pas un backend, aucune donnée
   utilisateur ne transite.
+  ⚠️ **Amendé par [ADR-0012](0012-github-pages-poc.md)** : l'hébergement retenu est **GitHub Pages**,
+  donc **hors UE et sans en-têtes HTTP personnalisés**. L'exigence « dans l'UE » énoncée ici n'est pas
+  tenue pour le POC — écart assumé, borné par le fait qu'aucune donnée utilisateur ne quitte le
+  navigateur, et à rouvrir avant tout usage avec de vrais documents.
 - La décision D16 (`docs/product/04-decisions-a-prendre.md`) est tranchée pour la Phase 1 et rouverte
   pour la Phase 3.
 
