@@ -1,7 +1,7 @@
 # Current Progress
 
 > Mis à jour à chaque tâche significative. **Aucune donnée personnelle, aucun secret ici.**
-> Dernière mise à jour : 2026-10-06 — session *Architecture*.
+> Dernière mise à jour : 2026-10-06 — session *Web/UX* (Session A, `feature/poc-shell`).
 
 ## Completed
 
@@ -37,6 +37,24 @@
   - Stack, stratégie de tests, DevSecOps, arborescence, classification des données et roadmap
     répercutés. `02-mobile-poc.md` renommé `02-poc-pwa.md`.
 
+- **Session A — coquille PWA et design system** (branche `feature/poc-shell`, PR vers `pre`)
+  - Monorepo pnpm + Turborepo, TypeScript `strict`, ESLint/Prettier partagés ; règle bloquante
+    d'isolation de `packages/core` (aucun React, aucune API navigateur), prouvée par un test qui
+    échoue sur `window`, `document`, `indexedDB`, `crypto`, `globalThis.window` et `react`.
+  - `packages/core/src/ports` : `StorageProvider`, `CryptoProvider`, `AIProvider`, `SecureKeyStore`,
+    `Clock`, `Logger` (interfaces uniquement ; `Logger` n'accepte que des nombres/booléens en champs).
+  - `packages/ui` : tokens, bouton, champ, carte, étape, alerte, modale de confirmation.
+  - `apps/web` : accueil, création du profil (prénom → code à 6 chiffres → confirmation), verrouillage
+    (5 essais puis attente croissante, verrouillage auto à 5 min et à la perte de visibilité),
+    bandeau « version d'évaluation » permanent, écran « Où sont mes données ? » (état de
+    `navigator.storage.persist()`, suppression totale avec confirmation).
+  - Adapters web : IndexedDB, WebCrypto (AES-256-GCM, chiffrement enveloppe) avec Argon2id (`hash-wasm`,
+    mono-thread), clés en mémoire seulement.
+  - Service worker écrit à la main (précache seul), CSP en `<meta>`, `404.html`, `robots.txt` + `noindex`,
+    base `/veille-app/` ([ADR-0012](decisions/0012-github-pages-poc.md)).
+  - Workflows : `ci.yml` (lint, types, unitaires, build, E2E) et `deploy-pages.yml` (déploiement sur
+    `main` puis E2E rejoués **contre l'URL Pages**).
+
 ## In Progress
 
 - **Phase 1 — POC UX/UI en PWA.** Phase ouverte : l'architecture est validée (D22) et la plateforme
@@ -68,7 +86,7 @@ confiance, qualification du responsable de traitement en Phase 1.
 Les trois sessions ci-dessous sont décrites intégralement — périmètre de fichiers, interdits,
 critères de fin — dans [`docs/product/05-briefs-sessions.md`](product/05-briefs-sessions.md).
 
-1. **Session A — `feature/poc-shell`** : squelette du monorepo (pnpm + Turborepo + TypeScript strict),
+1. **Session A — `feature/poc-shell`** (livrée en PR ; critères sur l'URL Pages à confirmer après promotion vers `main` et activation de Pages) : squelette du monorepo (pnpm + Turborepo + TypeScript strict),
    `apps/web` (React + Vite + service worker + CSP stricte), design system `packages/ui`, coquille
    (accueil, verrouillage par code, bandeau « version d'évaluation », écran « Où sont mes données ? »),
    ports dans `packages/core`, règle ESLint interdisant à `packages/core` d'importer React ou une API
