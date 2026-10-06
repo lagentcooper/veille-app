@@ -1,3 +1,4 @@
+import { Icon } from "@veille/ui";
 import type { Finding } from "@veille/core/will";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
@@ -21,12 +22,18 @@ export function FindingsList({
         const to = fixPath(f);
         return (
           <li key={`${f.code}:${f.field ?? ""}:${i}`} data-kind={f.kind}>
-            <span aria-hidden="true">{f.kind === "blocking" ? "🛑" : "⚠️"}</span> {text(f)}{" "}
-            {to ? (
-              <Link to={to}>
-                {f.kind === "blocking" ? t("will.finding.change") : t("will.finding.fix")}
-              </Link>
-            ) : null}
+            <Icon name={f.kind === "blocking" ? "alert-octagon" : "alert-triangle"} />
+            <span className="will-findings__text">
+              {text(f)}
+              {to ? (
+                <>
+                  {" "}
+                  <Link to={to}>
+                    {f.kind === "blocking" ? t("will.finding.change") : t("will.finding.fix")}
+                  </Link>
+                </>
+              ) : null}
+            </span>
           </li>
         );
       })}

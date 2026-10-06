@@ -1,40 +1,61 @@
 /* Veille design tokens and component styles.
    Text sizes are in rem so they follow the user's browser/system font setting.
-   No inline styles anywhere: the CSP forbids `unsafe-inline` (AGENTS.md §5.5). */
+   No inline styles anywhere: the CSP forbids `unsafe-inline` (AGENTS.md §5.5).
+
+   Colour system: one calm base (warm paper + petrol blue) and four *meaningful* tints — sage = done,
+   amber = something to complete, terracotta = see a professional, slate = not started. A tint is
+   never used for decoration, and a state is never carried by colour alone (icon + words always). */
 
 :root {
-  --v-color-bg: #ffffff;
-  --v-color-surface: #f6f4ee;
-  --v-color-text: #1f2430;
-  --v-color-text-muted: #4a5160;
-  --v-color-border: #8a90a0;
-  --v-color-primary: #1f4e8c;
-  --v-color-primary-hover: #163a69;
+  /* Surfaces and text */
+  --v-color-bg: #f5f4ef;
+  --v-color-surface: #ffffff;
+  --v-color-surface-alt: #eef2f4;
+  --v-color-text: #17212b;
+  --v-color-text-muted: #4a5563;
+  --v-color-border: #dcdfe3; /* decorative hairline */
+  --v-color-border-strong: #7a8493; /* controls: >= 3:1 on surface and on bg (WCAG 1.4.11) */
+
+  /* Brand */
+  --v-color-primary: #1d4f6e;
+  --v-color-primary-hover: #143b54;
   --v-color-on-primary: #ffffff;
+  --v-color-tint: #e3eef4;
+  --v-color-tint-hover: #d2e3ee;
+  --v-color-on-tint: #143b54;
   --v-color-focus: #0b57d0;
-  --v-color-info-bg: #e8f0fb;
-  --v-color-info-text: #17365f;
-  --v-color-warning-bg: #fff4d6;
-  --v-color-warning-text: #5b3a00;
-  --v-color-danger-bg: #fde8e8;
-  --v-color-danger-text: #7a1212;
-  --v-color-danger: #a31919;
-  --v-color-success-bg: #e3f4e8;
-  --v-color-success-text: #124b24;
+
+  /* Meaningful tints: background, text on it, and an accent for borders/icons (>= 3:1 on white) */
+  --v-color-success-bg: #e4f1e8;
+  --v-color-success-text: #1c5436;
+  --v-color-success-accent: #2e7d4f;
+  --v-color-warning-bg: #fcf0d6;
+  --v-color-warning-text: #664000;
+  --v-color-warning-accent: #a86e0e;
+  --v-color-danger-bg: #fae5df;
+  --v-color-danger-text: #7c2916;
+  --v-color-danger: #b6432a;
+  --v-color-neutral-bg: #e9edf1;
+  --v-color-neutral-text: #3d4756;
+  --v-color-neutral-accent: #7a8493;
+  --v-color-info-bg: var(--v-color-tint);
+  --v-color-info-text: var(--v-color-on-tint);
+
   /* Disabled controls stay readable (WCAG 1.4.3 AA, >= 4.5:1) and read as inactive by being grey, not by
      being faded: `opacity` would blend text and background with whatever is behind. */
   --v-color-disabled-bg: #646b78; /* white on it: 5.36:1 */
   --v-color-on-disabled: #ffffff;
-  --v-color-disabled-text: #5d6475; /* on white: 5.92:1, on --v-color-surface: 5.39:1 */
+  --v-color-disabled-text: #5d6475; /* on white: 5.92:1, on the page background: 5.38:1 */
   --v-color-disabled-border: #8a90a0;
-  --v-color-banner-bg: #5b3a00;
+
+  --v-color-banner-bg: #4a3200;
   --v-color-banner-text: #ffffff;
 
   --v-font-family:
     system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --v-font-size-base: 1.125rem;
   --v-font-size-small: 1rem;
-  --v-font-size-title: 1.75rem;
+  --v-font-size-title: 1.875rem;
   --v-line-height: 1.55;
 
   --v-space-1: 0.25rem;
@@ -42,7 +63,9 @@
   --v-space-3: 1rem;
   --v-space-4: 1.5rem;
   --v-space-5: 2rem;
-  --v-radius: 0.75rem;
+  --v-radius: 0.875rem;
+  --v-radius-card: 1.125rem;
+  --v-shadow-card: 0 1px 2px rgb(23 33 43 / 0.06), 0 8px 24px rgb(23 33 43 / 0.06);
   --v-target-min: 3rem; /* 48px at default size, grows with the font setting */
   --v-measure: 40rem;
 }
@@ -64,16 +87,27 @@ body {
   font-family: var(--v-font-family);
   font-size: var(--v-font-size-base);
   line-height: var(--v-line-height);
+  -webkit-font-smoothing: antialiased;
 }
 
 h1,
 h2,
 h3 {
-  line-height: 1.25;
   margin: 0 0 var(--v-space-3);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 h1 {
   font-size: var(--v-font-size-title);
+  font-weight: 750;
+}
+h2 {
+  font-size: 1.3125rem;
+  font-weight: 700;
+}
+h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
 }
 p {
   margin: 0 0 var(--v-space-3);
@@ -102,12 +136,21 @@ p {
   gap: var(--v-space-3);
 }
 
+/* Icon */
+.v-icon {
+  flex: none;
+  width: 1.25em;
+  height: 1.25em;
+  vertical-align: -0.2em;
+}
+
 /* Button */
 .v-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: var(--v-target-min);
+  gap: var(--v-space-2);
+  min-height: 3.25rem;
   min-width: var(--v-target-min);
   padding: var(--v-space-2) var(--v-space-4);
   border: 0.125rem solid var(--v-color-primary);
@@ -115,27 +158,38 @@ p {
   background: var(--v-color-primary);
   color: var(--v-color-on-primary);
   font: inherit;
-  font-weight: 600;
+  font-weight: 650;
+  line-height: 1.25;
   cursor: pointer;
   text-decoration: none;
+  box-shadow: 0 1px 2px rgb(23 33 43 / 0.18);
 }
 .v-button:hover {
   background: var(--v-color-primary-hover);
+  border-color: var(--v-color-primary-hover);
 }
 .v-button--secondary {
-  background: var(--v-color-bg);
-  color: var(--v-color-primary);
+  border-color: transparent;
+  background: var(--v-color-tint);
+  color: var(--v-color-on-tint);
+  box-shadow: none;
 }
 .v-button--secondary:hover {
-  background: var(--v-color-info-bg);
+  border-color: transparent;
+  background: var(--v-color-tint-hover);
 }
 .v-button--danger {
   background: var(--v-color-danger);
   border-color: var(--v-color-danger);
 }
+.v-button--danger:hover {
+  background: var(--v-color-danger-text);
+  border-color: var(--v-color-danger-text);
+}
 .v-button--block {
   width: 100%;
 }
+
 /* Disabled: aria-disabled is kept (the control stays in the keyboard order for screen readers),
    so both selectors are styled identically. Hover must not change a disabled control. */
 .v-button[aria-disabled="true"],
@@ -145,13 +199,14 @@ p {
   background: var(--v-color-disabled-bg);
   border-color: var(--v-color-disabled-bg);
   color: var(--v-color-on-disabled);
+  box-shadow: none;
   cursor: not-allowed;
 }
 .v-button--secondary[aria-disabled="true"],
 .v-button--secondary:disabled,
 .v-button--secondary[aria-disabled="true"]:hover,
 .v-button--secondary:disabled:hover {
-  background: var(--v-color-bg);
+  background: var(--v-color-surface);
   border-color: var(--v-color-disabled-border);
   color: var(--v-color-disabled-text);
 }
@@ -163,7 +218,7 @@ p {
   gap: var(--v-space-2);
 }
 .v-field__label {
-  font-weight: 600;
+  font-weight: 650;
 }
 .v-field__hint {
   color: var(--v-color-text-muted);
@@ -171,16 +226,19 @@ p {
 }
 .v-field__error {
   color: var(--v-color-danger-text);
-  font-weight: 600;
+  font-weight: 650;
 }
 .v-field__input {
-  min-height: var(--v-target-min);
+  min-height: 3.25rem;
   padding: var(--v-space-2) var(--v-space-3);
-  border: 0.125rem solid var(--v-color-border);
+  border: 0.125rem solid var(--v-color-border-strong);
   border-radius: var(--v-radius);
-  background: var(--v-color-bg);
+  background: var(--v-color-surface);
   color: var(--v-color-text);
   font: inherit;
+}
+.v-field__input:focus-visible {
+  border-color: var(--v-color-focus);
 }
 .v-field__input--code {
   letter-spacing: 0.4em;
@@ -188,7 +246,7 @@ p {
   font-variant-numeric: tabular-nums;
 }
 .v-field__input:disabled {
-  background: var(--v-color-surface);
+  background: var(--v-color-surface-alt);
   color: var(--v-color-disabled-text);
   cursor: not-allowed;
 }
@@ -200,11 +258,57 @@ p {
 .v-card {
   padding: var(--v-space-4);
   border: 0.0625rem solid var(--v-color-border);
-  border-radius: var(--v-radius);
+  border-radius: var(--v-radius-card);
   background: var(--v-color-surface);
+  box-shadow: var(--v-shadow-card);
 }
 .v-card > :last-child {
   margin-bottom: 0;
+}
+/* A tone adds a coloured spine, never a coloured fill: the text always sits on white. */
+.v-card--success {
+  border-inline-start: 0.375rem solid var(--v-color-success-accent);
+}
+.v-card--warning {
+  border-inline-start: 0.375rem solid var(--v-color-warning-accent);
+}
+.v-card--danger {
+  border-inline-start: 0.375rem solid var(--v-color-danger);
+}
+.v-card--neutral {
+  border-inline-start: 0.375rem solid var(--v-color-neutral-accent);
+}
+
+/* Badge: icon + words, tinted */
+.v-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: var(--v-font-size-small);
+  font-weight: 650;
+  line-height: 1.3;
+}
+.v-badge--success {
+  background: var(--v-color-success-bg);
+  color: var(--v-color-success-text);
+}
+.v-badge--warning {
+  background: var(--v-color-warning-bg);
+  color: var(--v-color-warning-text);
+}
+.v-badge--danger {
+  background: var(--v-color-danger-bg);
+  color: var(--v-color-danger-text);
+}
+.v-badge--neutral {
+  background: var(--v-color-neutral-bg);
+  color: var(--v-color-neutral-text);
+}
+.v-badge--info {
+  background: var(--v-color-tint);
+  color: var(--v-color-on-tint);
 }
 
 /* Stepper */
@@ -219,6 +323,7 @@ p {
   flex: 1;
   padding-top: var(--v-space-2);
   border-top: 0.375rem solid var(--v-color-border);
+  border-radius: 999px;
   font-size: var(--v-font-size-small);
   color: var(--v-color-text-muted);
 }
@@ -233,11 +338,22 @@ p {
 
 /* Alert */
 .v-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--v-space-3);
   padding: var(--v-space-3) var(--v-space-4);
   border-radius: var(--v-radius);
-  border-inline-start: 0.375rem solid currentColor;
 }
-.v-alert > :last-child {
+.v-alert > .v-icon {
+  margin-top: 0.15rem;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.v-alert__body {
+  flex: 1;
+  min-width: 0;
+}
+.v-alert__body > :last-child {
   margin-bottom: 0;
 }
 .v-alert--info {
@@ -265,13 +381,14 @@ p {
 .v-dialog {
   max-width: min(var(--v-measure), calc(100vw - 2rem));
   padding: var(--v-space-4);
-  border: 0.125rem solid var(--v-color-border);
-  border-radius: var(--v-radius);
-  background: var(--v-color-bg);
+  border: 0;
+  border-radius: var(--v-radius-card);
+  background: var(--v-color-surface);
   color: var(--v-color-text);
+  box-shadow: 0 24px 64px rgb(23 33 43 / 0.35);
 }
 .v-dialog::backdrop {
-  background: rgb(0 0 0 / 0.6);
+  background: rgb(23 33 43 / 0.6);
 }
 .v-dialog__actions {
   display: flex;
@@ -299,22 +416,27 @@ p {
 .v-choice__legend {
   padding: 0;
   margin-bottom: var(--v-space-2);
-  font-weight: 600;
+  font-weight: 650;
 }
 .v-choice__option {
   display: flex;
   align-items: center;
   gap: var(--v-space-3);
-  min-height: var(--v-target-min);
+  min-height: 3.5rem;
   padding: var(--v-space-2) var(--v-space-3);
-  border: 0.125rem solid var(--v-color-border);
+  border: 0.125rem solid var(--v-color-border-strong);
   border-radius: var(--v-radius);
-  background: var(--v-color-bg);
+  background: var(--v-color-surface);
   cursor: pointer;
+}
+.v-choice__option:hover {
+  background: var(--v-color-surface-alt);
 }
 .v-choice__option:has(input:checked) {
   border-color: var(--v-color-primary);
-  background: var(--v-color-info-bg);
+  background: var(--v-color-tint);
+  color: var(--v-color-on-tint);
+  font-weight: 650;
 }
 .v-choice__option input {
   flex: none;
@@ -336,8 +458,87 @@ p {
 .v-progress__bar {
   display: block;
   width: 100%;
-  height: 0.75rem;
+  height: 0.625rem;
+  border: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--v-color-border);
   accent-color: var(--v-color-primary);
+  appearance: none;
+}
+.v-progress__bar::-webkit-progress-bar {
+  background: var(--v-color-border);
+}
+.v-progress__bar::-webkit-progress-value {
+  border-radius: 999px;
+  background: var(--v-color-primary);
+}
+.v-progress__bar::-moz-progress-bar {
+  border-radius: 999px;
+  background: var(--v-color-primary);
+}
+
+/* Callout: a documentation insert (title, icon, body), collapsible and open by default */
+.v-callout {
+  border: 0.0625rem solid var(--v-color-border);
+  border-radius: var(--v-radius-card);
+  background: var(--v-color-surface);
+  box-shadow: var(--v-shadow-card);
+}
+.v-callout__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--v-space-3);
+  min-height: 3.5rem;
+  padding: var(--v-space-3) var(--v-space-4);
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+.v-callout__summary::-webkit-details-marker {
+  display: none;
+}
+.v-callout__summary > .v-icon:first-child {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0.375rem;
+  box-sizing: content-box;
+  border-radius: 999px;
+  background: var(--v-color-tint);
+  color: var(--v-color-primary);
+}
+.v-callout__title {
+  flex: 1;
+}
+.v-callout__chevron {
+  color: var(--v-color-text-muted);
+}
+.v-callout[open] .v-callout__chevron {
+  transform: rotate(180deg);
+}
+.v-callout__body {
+  padding: 0 var(--v-space-4) var(--v-space-4);
+}
+.v-callout__body > :last-child {
+  margin-bottom: 0;
+}
+
+/* Meter: a segmented bar for "n of m", with the numbers in words next to it */
+.v-meter {
+  display: flex;
+  gap: 0.25rem;
+  margin: var(--v-space-2) 0;
+  padding: 0;
+  list-style: none;
+}
+.v-meter__segment {
+  flex: 1;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--v-color-border);
+}
+.v-meter__segment[data-on="true"] {
+  background: var(--v-color-success-accent);
 }
 
 /* No colour transition on buttons. React reuses the same <button> between two screens while its
@@ -351,5 +552,5 @@ a.v-button {
   text-decoration: none;
 }
 a.v-button--secondary {
-  color: var(--v-color-primary);
+  color: var(--v-color-on-tint);
 }

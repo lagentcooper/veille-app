@@ -8,3 +8,7 @@ export { Checkbox, type CheckboxProps } from "./Checkbox";
 export { ChoiceGroup, type ChoiceGroupProps, type ChoiceOption } from "./ChoiceGroup";
 export { Progress, type ProgressProps } from "./Progress";
 export { TextArea, type TextAreaProps } from "./TextArea";
+export { Badge, type BadgeProps, type Tone } from "./Badge";
+export { Callout, type CalloutProps } from "./Callout";
+export { Icon, type IconName, type IconProps } from "./Icon";
+export { Meter, type MeterProps } from "./Meter";
