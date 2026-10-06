@@ -12,7 +12,7 @@ export interface WillClock {
 }
 
 export interface WillHasher {
-  readonly algorithm: 'sha-256';
+  readonly algorithm: "sha-256";
   /** Lowercase hex digest of the UTF-8 encoding of `input`. */
   hashHex(input: string): Promise<string>;
 }

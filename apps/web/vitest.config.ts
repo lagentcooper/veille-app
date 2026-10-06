@@ -3,14 +3,6 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      "@veille/core/ports": new URL("../../packages/core/src/ports/index.ts", import.meta.url)
-        .pathname,
-      "@veille/core/will": new URL("../../packages/core/src/will/index.ts", import.meta.url)
-        .pathname,
-    },
-  },
   test: {
     environment: "jsdom",
     globals: true,

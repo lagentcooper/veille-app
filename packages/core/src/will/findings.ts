@@ -8,21 +8,21 @@
  * Every user-facing text is an i18n KEY plus parameters — wording lives in `apps/web/src/i18n`.
  */
 
-export type AssessmentLevel = 'complete' | 'incomplete' | 'professional-required';
+export type AssessmentLevel = "complete" | "incomplete" | "professional-required";
 
-export type FindingKind = 'missing' | 'inconsistency' | 'discouraged' | 'blocking';
+export type FindingKind = "missing" | "inconsistency" | "discouraged" | "blocking";
 
 /** Situations from §2.2 that stop the review step and send the user to a notary / lawyer. */
 export const BLOCKING_CASES = [
-  'reserved-heirs',
-  'real-estate-or-business',
-  'foreign-element',
-  'marital-regime-pacs-or-life-insurance',
-  'legal-entity-beneficiary',
-  'minor-or-protected-person',
-  'blended-family',
-  'body-wishes',
-  'conditional-clause',
+  "reserved-heirs",
+  "real-estate-or-business",
+  "foreign-element",
+  "marital-regime-pacs-or-life-insurance",
+  "legal-entity-beneficiary",
+  "minor-or-protected-person",
+  "blended-family",
+  "body-wishes",
+  "conditional-clause",
 ] as const;
 export type BlockingCase = (typeof BLOCKING_CASES)[number];
 
@@ -30,7 +30,7 @@ export interface Finding {
   kind: FindingKind;
   /** Stable machine code, e.g. `missing.testatorFullName` or `blocking.reserved-heirs`. */
   code: string;
-  level: Exclude<AssessmentLevel, 'complete'>;
+  level: Exclude<AssessmentLevel, "complete">;
   /** i18n key, always under `will.finding.`. */
   messageKey: string;
   /** Dotted path of the field to fix, when there is one. */
@@ -39,7 +39,7 @@ export interface Finding {
   params?: Readonly<Record<string, string | number>>;
 }
 
-export type NotaryAdvice = 'recommended' | 'required';
+export type NotaryAdvice = "recommended" | "required";
 
 export interface Assessment {
   level: AssessmentLevel;
@@ -53,10 +53,14 @@ export interface Assessment {
   notaryAdvice: NotaryAdvice;
 }
 
-const RANK: Record<AssessmentLevel, number> = { complete: 0, incomplete: 1, 'professional-required': 2 };
+const RANK: Record<AssessmentLevel, number> = {
+  complete: 0,
+  incomplete: 1,
+  "professional-required": 2,
+};
 
 export function worstLevel(levels: readonly AssessmentLevel[]): AssessmentLevel {
-  return levels.reduce<AssessmentLevel>((acc, l) => (RANK[l] > RANK[acc] ? l : acc), 'complete');
+  return levels.reduce<AssessmentLevel>((acc, l) => (RANK[l] > RANK[acc] ? l : acc), "complete");
 }
 
 export function buildAssessment(findings: readonly Finding[]): Assessment {
@@ -64,20 +68,27 @@ export function buildAssessment(findings: readonly Finding[]): Assessment {
   return {
     level,
     findings,
-    blocksReviewStep: level === 'professional-required',
-    notaryAdvice: level === 'professional-required' ? 'required' : 'recommended',
+    blocksReviewStep: level === "professional-required",
+    notaryAdvice: level === "professional-required" ? "required" : "recommended",
   };
 }
 
-export function missing(field: string, extra?: Pick<Finding, 'params'>): Finding {
-  return { kind: 'missing', code: `missing.${field}`, level: 'incomplete', messageKey: `will.finding.missing.${field}`, field, ...extra };
+export function missing(field: string, extra?: Pick<Finding, "params">): Finding {
+  return {
+    kind: "missing",
+    code: `missing.${field}`,
+    level: "incomplete",
+    messageKey: `will.finding.missing.${field}`,
+    field,
+    ...extra,
+  };
 }
 
-export function inconsistency(code: string, field?: string, params?: Finding['params']): Finding {
+export function inconsistency(code: string, field?: string, params?: Finding["params"]): Finding {
   return {
-    kind: 'inconsistency',
+    kind: "inconsistency",
     code: `inconsistency.${code}`,
-    level: 'incomplete',
+    level: "incomplete",
     messageKey: `will.finding.inconsistency.${code}`,
     ...(field === undefined ? {} : { field }),
     ...(params === undefined ? {} : { params }),
@@ -86,9 +97,9 @@ export function inconsistency(code: string, field?: string, params?: Finding['pa
 
 export function blocking(blockCase: BlockingCase, trigger: string, field?: string): Finding {
   return {
-    kind: 'blocking',
+    kind: "blocking",
     code: `blocking.${blockCase}`,
-    level: 'professional-required',
+    level: "professional-required",
     messageKey: `will.finding.blocking.${blockCase}`,
     ...(field === undefined ? {} : { field }),
     params: { trigger },

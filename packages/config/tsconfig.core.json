@@ -1,3 +1,10 @@
+// Typecheck of packages/core SOURCE. This package owns it, so packages/core has no tsconfig and no
+// typecheck script of its own: one source of truth per file set.
+//
+// `types: []` is the point of this file: with no ambient type declarations at all, a browser or Node
+// global in packages/core/src does not even typecheck. The tests need `@types/node`, so they are
+// covered by tsconfig.core-tests.json, which extends this one — that keeps the source strictly
+// typeless instead of loosening it for everybody.
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": { "lib": ["ES2022"], "types": [], "paths": {} },
