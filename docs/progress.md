@@ -45,6 +45,11 @@
   Documents justificatifs, contact de confiance, assistant IA et export VEA complet sont **hors
   périmètre** jusqu'à ce que le parcours de legs ait été testé auprès d'utilisateurs réels.
   Briefs des sessions : [`docs/product/05-briefs-sessions.md`](product/05-briefs-sessions.md).
+- **Distribution du POC : GitHub Pages** ([ADR-0012](decisions/0012-github-pages-poc.md)), déployé
+  depuis `main` par GitHub Actions. Dépôt **public**, URL `https://lagentcooper.github.io/veille-app/`.
+  Contraintes qui en découlent et qui ne doivent pas être oubliées : CSP en `<meta>` seulement,
+  pas de `COOP`/`COEP` donc Argon2id mono-thread, sous-chemin `/veille-app/`, `404.html` de repli,
+  `noindex`. Nouveaux risques **R29** (URL publique) et **R30** (absence d'en-têtes).
 
 ## Blocked
 
@@ -86,8 +91,12 @@ critères de fin — dans [`docs/product/05-briefs-sessions.md`](product/05-brie
 *La session Trusted Contact, précédemment annoncée comme démarrable en parallèle, est reportée :
 le porteur a restreint le POC au seul document de legs.*
 7. En parallèle : prise de contact avec un juriste (points ⚖️) et recrutement des testeurs.
-8. **Réglages GitHub restant à la charge du porteur** : protection de `main` et `pre`, secret
-   scanning + push protection, CODEOWNERS (identifiants réels requis).
+8. **Réglages GitHub restant à la charge du porteur** (aucun n'est faisable depuis une session d'agent) :
+   - **activer GitHub Pages** : *Settings → Pages → Build and deployment → Source : GitHub Actions* —
+     **bloquant pour la session A** ;
+   - **protection de `main` et `pre`** : PR obligatoire, CI verte, pas de force-push. Tant qu'elle
+     manque, `main` est déployé publiquement sans garde-fou (risque R28 rehaussé) ;
+   - secret scanning + push protection ; CODEOWNERS (identifiants réels requis).
 
 ## Known Issues / Risques ouverts
 

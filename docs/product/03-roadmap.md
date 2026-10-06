@@ -64,8 +64,9 @@ publier ne demande qu'un lien (⇒ bandeau « version d'évaluation » et refus 
 la complexité juridique dégrade l'UX ; l'attente d'une IA « ChatGPT » ; éviction du stockage par le
 navigateur pendant une session de test (R26).
 
-**Dépendances** — réponses aux questions produit 1 à 3 ; recrutement des testeurs ; hébergement
-statique UE pour distribuer le lien.
+**Dépendances** — réponses aux questions produit 1 à 3 ; recrutement des testeurs ; **GitHub Pages
+activé** par le porteur (*Settings → Pages → Source : GitHub Actions*) pour distribuer le lien
+([ADR-0012](../decisions/0012-github-pages-poc.md)).
 
 **Ne PAS faire** — backend, compte distant, synchronisation, vraie IA, vraie activation
 successorale, RBAC, publication grand public, optimisation de performance, application native
