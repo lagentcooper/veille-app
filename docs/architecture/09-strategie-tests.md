@@ -6,16 +6,21 @@ Règle AGENTS.md §9 : « Ça a l'air de marcher » n'est jamais une preuve.
 
 ## 11.1 Niveaux
 
-| Niveau | Périmètre | Outil | Quand |
-|--------|-----------|-------|-------|
-| **Unit** | `packages/core` (règles legs, permissions, machine d'activation, sérialisation d'export) | Jest | À chaque PR, < 10 s |
-| **Integration** | Adapters réels : stockage chiffré, migrations, index vectoriel, provider IA | Jest + SQLite en mémoire/fichier temporaire | À chaque PR |
-| **Composant/UI** | Écrans, accessibilité, états d'erreur | React Native Testing Library | À chaque PR |
-| **E2E** | 8 parcours du POC sur simulateur/émulateur | Maestro | Nightly + avant release |
-| **Sécurité** | Crypto, permissions, absence de fuite, injection | Jest + règles Semgrep + tests réseau | À chaque PR sur chemins sensibles |
-| **Privacy** | Absence de PII dans les logs/exports non chiffrés, consentements | Jest + scanner de motifs | À chaque PR |
-| **Migration** | Schéma N→N+1, format d'export v1→v2 | Jest avec jeux de données figés | À chaque PR touchant un schéma |
-| **Performance** | Import de 100 documents, recherche, latence IA | Maestro + mesures | Avant release |
+Outillage de Phase 1 (PWA, [ADR-0011](../decisions/0011-pwa-poc-phase-1.md)) : **Vitest**, **Testing
+Library (DOM)**, **Playwright**. En Phase 3, l'application native reprendra Jest + RNTL + Maestro ;
+les tests de `packages/core`, eux, ne changent pas — ils ne dépendent d'aucune plateforme.
+
+| Niveau | Périmètre | Outil (Phase 1) | Quand |
+|--------|-----------|-----------------|-------|
+| **Unit** | `packages/core` (règles legs, permissions, machine d'activation, sérialisation d'export) | Vitest | À chaque PR, < 10 s |
+| **Integration** | Adapters réels : stockage chiffré (IndexedDB + OPFS), migrations, provider IA | Vitest en environnement navigateur (Playwright runner) | À chaque PR |
+| **Composant/UI** | Écrans, accessibilité, états d'erreur | Testing Library (DOM) + `axe` | À chaque PR |
+| **E2E** | 8 parcours du POC dans un vrai navigateur | Playwright (Chromium + WebKit) | Nightly + avant release |
+| **Sécurité** | Crypto, permissions, absence de fuite, injection, **CSP et service worker** | Vitest + Playwright + règles Semgrep | À chaque PR sur chemins sensibles |
+| **Privacy** | Absence de PII dans les logs/exports non chiffrés, consentements | Vitest + scanner de motifs | À chaque PR |
+| **Migration** | Schéma N→N+1, format d'export v1→v2 | Vitest avec jeux de données figés | À chaque PR touchant un schéma |
+| **Hors ligne** | L'application démarre et fonctionne réseau coupé | Playwright, contexte `offline` | À chaque PR |
+| **Performance** | Import de 100 documents, recherche | Playwright + mesures | Avant release |
 
 ---
 
@@ -23,7 +28,7 @@ Règle AGENTS.md §9 : « Ça a l'air de marcher » n'est jamais une preuve.
 
 | Fonctionnalité | Unit | Integration | E2E | Security | Privacy |
 |----------------|------|-------------|-----|----------|---------|
-| Profil local / verrouillage | ✅ règles de session | ✅ keystore | ✅ création + verrouillage | ✅ verrouillage en arrière-plan, échecs de code | ✅ aucune donnée hors appareil |
+| Profil local / verrouillage | ✅ règles de session | ✅ dérivation et détention de la KEK | ✅ création + verrouillage | ✅ verrouillage à la perte de visibilité, échecs de code, **KEK jamais persistée** | ✅ aucune donnée hors appareil |
 | Document de legs — rédaction | ✅ complétude, cohérence | ✅ persistance chiffrée | ✅ parcours complet | ⚪ | ✅ pas de log de contenu |
 | Document de legs — validation | ✅ **règles de blocage (notaire requis)** | ✅ | ✅ écran de contrôle | ⚪ | ⚪ |
 | Historique des versions | ✅ immuabilité, hash | ✅ | ✅ consultation | ✅ non-altérabilité | ⚪ |
@@ -45,10 +50,24 @@ Règle AGENTS.md §9 : « Ça a l'air de marcher » n'est jamais une preuve.
 ## 11.3 Tests de sécurité et privacy — contenu minimal
 
 **Chiffrement**
-- Le fichier sur disque ne contient jamais le texte en clair (recherche de motif dans les octets).
+- Le fichier stocké ne contient jamais le texte en clair (recherche de motif dans les octets).
+  En Phase 1, « stocké » signifie **IndexedDB et OPFS**, inspectés par le test.
 - Deux chiffrements du même contenu produisent des sorties différentes (IV aléatoire).
 - Une altération d'un octet du chiffré fait échouer le déchiffrement (GCM).
-- La clé n'apparaît jamais dans un dump mémoire de test, ni en base, ni dans les préférences.
+- La clé n'apparaît jamais en base ni dans les préférences.
+- **Phase 1, spécifique** : après déverrouillage, la KEK n'est présente **dans aucun** de
+  IndexedDB, OPFS, `localStorage`, `sessionStorage` — vérifié par énumération complète du stockage
+  de l'origine, pas par échantillonnage.
+- **Phase 1, spécifique** : après verrouillage ou rechargement, aucun contenu n'est déchiffrable
+  sans ressaisie du code.
+
+**Web (Phase 1 uniquement)**
+- La CSP servie est stricte : ni `unsafe-inline`, ni `unsafe-eval`, ni `*` sur `script-src`.
+- Aucune ressource n'est chargée depuis une origine tierce (assertion sur toutes les requêtes
+  observées pendant un parcours complet).
+- L'application démarre et reste utilisable **réseau coupé**, après une première visite.
+- Le service worker ne met en cache **aucune** réponse contenant du contenu utilisateur.
+- La demande de persistance du stockage est effectuée, et son refus est **affiché** à l'utilisateur.
 
 **Permissions**
 - Un contact « désigné » n'accède à rien : chaque méthode d'accès testée renvoie un refus.
@@ -61,8 +80,10 @@ Règle AGENTS.md §9 : « Ça a l'air de marcher » n'est jamais une preuve.
 - Assertion : la réponse ne suit jamais l'instruction injectée, le `warning` est levé, aucune sortie réseau.
 
 **Fuite de données**
-- Une session complète (import, question, export) ne produit **aucune** requête sortante en Phase 1
-  (interception au niveau du runtime réseau, test échoue si une requête est émise).
+- Une session complète (import, question, export) ne produit **aucune** requête sortante en Phase 1.
+  L'application étant servie par HTTP, l'assertion porte sur l'absence de toute requête **après le
+  chargement initial**, hors assets de même origine : interception de `fetch`, `XMLHttpRequest`,
+  `WebSocket`, `EventSource` et `navigator.sendBeacon`, le test échoue si une requête est émise.
 - Scan des logs : aucun motif email/IBAN/téléphone/NIR.
 - L'export non chiffré ne contient que ce que l'utilisateur a demandé.
 

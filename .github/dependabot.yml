@@ -1,0 +1,14 @@
+version: 2
+
+# Only the GitHub Actions ecosystem is declared: no package manifest exists yet.
+# Add the npm/pnpm ecosystems in the same commit as the first package.json.
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "chore"

@@ -3,6 +3,11 @@
 Chaque ligne : **qui décide**, **impact si on ne décide pas**, **recommandation de l'architecte**.
 Les décisions marquées 🔴 sont **bloquantes** pour la Phase 1.
 
+> **État au 2026-09-14** : le porteur a validé l'architecture (D22) et tranché la plateforme du POC
+> (D16 → PWA, [ADR-0011](../decisions/0011-pwa-poc-phase-1.md)). La Phase 1 est ouverte. Les
+> décisions 🔴 restantes — D1, D2, D3, D8, D9, D25 — restent à trancher ; elles conditionnent le
+> contenu des parcours, pas le démarrage du squelette applicatif.
+
 ---
 
 ## 17.1 Produit et juridique
@@ -34,9 +39,10 @@ Les décisions marquées 🔴 sont **bloquantes** pour la Phase 1.
 
 | # | Décision | Bloquant | Recommandation | Impact si reportée |
 |---|----------|----------|----------------|--------------------|
-| D16 | **React Native/Expo vs Flutter** | 🔴 | React Native + Expo (ADR-0002) — choisir Flutter si l'équipe est Dart | Réécriture complète |
+| D16 | **Plateforme du POC de Phase 1** | ✅ | Tranché : **PWA** ([ADR-0011](../decisions/0011-pwa-poc-phase-1.md)) — distribution par lien, itération rapide, accessibilité DOM | — |
+| D16bis | **Plateforme de production (Phase 3+)** : React Native/Expo, Flutter, ou PWA durcie | 🟠 (Phase 3) | React Native + Expo (ADR-0002) — **à reconfirmer à la fin de la Phase 1**, au vu des tests utilisateurs et de la maturité de WebAuthn PRF | Réécriture complète si le choix change tard |
 | D17 | Niveau d'IA visé (extraction vs raisonnement) | 🟠 | Commencer par **résumé + extraction + recherche** ; la génération libre est un bonus | Attentes irréalistes et coût matériel |
-| D18 | Appareils minimum supportés | 🟠 | iOS 16+ / Android 10+ avec secure element ; refus explicite en deçà | Promesses de sécurité non tenables |
+| D18 | Appareils minimum supportés | 🟠 | **Phase 1** : navigateurs cibles à figer (Chromium et WebKit récents, support OPFS et WebCrypto), testés en CI. **Phase 3** : iOS 16+ / Android 10+ avec secure element ; refus explicite en deçà | Promesses de sécurité non tenables ; divergences de moteurs découvertes en test utilisateur |
 | D19 | Monorepo | ✅ | Tranché : ADR-0001 | — |
 | D20 | Format d'export | ✅ | Tranché : VEA, ADR-0006 | — |
 | D21 | Langue et i18n | 🟢 | FR seul au lancement, clés i18n dès le début | Refonte de toutes les chaînes |
@@ -45,7 +51,7 @@ Les décisions marquées 🔴 sont **bloquantes** pour la Phase 1.
 
 | # | Décision | Bloquant | Recommandation |
 |---|----------|----------|----------------|
-| D22 | Qui valide l'architecture (ce document) ? | 🔴 | Le porteur du projet, explicitement, avant tout code |
+| D22 | Qui valide l'architecture (ce document) ? | ✅ | Tranché : validée par le porteur du projet. Phase 0 close, Phase 1 ouverte |
 | D23 | CODEOWNERS et responsable sécurité | 🟠 | Nommer une personne responsable des chemins sensibles |
 | D24 | Budget juriste + cryptographe + pentest | 🟠 | À provisionner dès maintenant (≈ le poste le plus sous-estimé) |
 | D25 | Panel de testeurs Phase 1 | 🔴 | 5 à 8 personnes, dont ≥ 2 de plus de 65 ans, recrutées **avant** la fin du POC |
@@ -57,8 +63,8 @@ Les décisions marquées 🔴 sont **bloquantes** pour la Phase 1.
 | ADR | Décision |
 |-----|----------|
 | [0001](../decisions/0001-monorepo-unique.md) | Monorepo unique |
-| [0002](../decisions/0002-react-native-expo.md) | React Native + Expo, TypeScript strict |
-| [0003](../decisions/0003-local-first-chiffrement.md) | Local-first, chiffrement enveloppe, clés dans le secure element |
+| [0002](../decisions/0002-react-native-expo.md) | React Native + Expo, TypeScript strict — **phases 3+** (amendé par ADR-0011) |
+| [0003](../decisions/0003-local-first-chiffrement.md) | Local-first, chiffrement enveloppe, clés dans le secure element — **variante navigateur en Phase 1** |
 | [0004](../decisions/0004-ai-provider-abstraction.md) | Abstraction `AIProvider`, mock en Phase 1, on-device par défaut |
 | [0005](../decisions/0005-contact-de-confiance.md) | Contact de confiance : aucun accès avant activation validée |
 | [0006](../decisions/0006-format-export-vea.md) | Format d'export ouvert VEA |
@@ -66,3 +72,4 @@ Les décisions marquées 🔴 sont **bloquantes** pour la Phase 1.
 | [0008](../decisions/0008-perimetre-juridique.md) | Périmètre juridique : le document n'est pas un testament valide en l'état |
 | [0009](../decisions/0009-observabilite-sans-pii.md) | Observabilité sans PII, télémétrie opt-in |
 | [0010](../decisions/0010-hebergement-ue-e2ee.md) | Hébergement UE et zero-knowledge côté serveur |
+| [0011](../decisions/0011-pwa-poc-phase-1.md) | **PWA pour le POC de Phase 1** ; amende ADR-0002 (portée réduite aux phases 3+) et ADR-0003 (variante navigateur) |

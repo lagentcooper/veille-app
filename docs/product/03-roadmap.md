@@ -7,19 +7,19 @@ Les durées sont indicatives pour une équipe de 1 à 3 personnes et doivent êt
 
 ---
 
-## Phase 0 — Cadrage (en cours, cette session)
+## Phase 0 — Structure du projet ✅ terminée
 
 **Objectifs** — poser une architecture et des règles permanentes permettant à plusieurs sessions de
 travailler sans perte de contexte.
 
 **Livrables** — `AGENTS.md`, `docs/architecture/*`, `docs/security/*`, `docs/privacy/*`,
-`docs/product/*`, ADR 0001–0010, `docs/progress.md`.
+`docs/product/*`, ADR 0001–0011, `docs/progress.md`.
 
 **Critères d'acceptation**
-- [ ] Un nouvel intervenant peut reprendre le projet avec le seul repository.
-- [ ] Chaque décision structurante a un ADR (Décision → Pourquoi → Alternative → Trade-off).
-- [ ] Les questions bloquantes sont listées et assignées.
-- [ ] **Validation explicite de l'architecture par le porteur du projet.**
+- [x] Un nouvel intervenant peut reprendre le projet avec le seul repository.
+- [x] Chaque décision structurante a un ADR (Décision → Pourquoi → Alternative → Trade-off).
+- [x] Les questions bloquantes sont listées et assignées.
+- [x] **Validation explicite de l'architecture par le porteur du projet.**
 
 **Risques** — architecture validée « par défaut » sans être lue ; hypothèses juridiques fausses (H1, H2).
 
@@ -27,39 +27,49 @@ travailler sans perte de contexte.
 
 ---
 
-## Phase 1 — POC UX/UI local (≈ 4 à 6 semaines)
+## Phase 1 — POC UX/UI en PWA (≈ 4 à 6 semaines) — **phase en cours**
+
+Plateforme : **application web progressive** ([ADR-0011](../decisions/0011-pwa-poc-phase-1.md)).
+Un testeur ouvre un lien et n'installe rien : c'est ce qui décide du nombre de tests réellement menés.
 
 **Objectifs** — valider le produit auprès de vrais utilisateurs (dont des personnes non technophiles
 et âgées) avant d'investir dans l'infrastructure.
 
 **Livrables**
-1. Squelette monorepo (`apps/mobile`, `packages/{core,ui,ai,config}`) + CI minimale.
+1. Squelette monorepo (`apps/web`, `packages/{core,ui,ai,config}`) + CI minimale.
 2. Design system de base (`packages/ui`) : accessibilité, typographie, composants.
-3. Les 8 parcours de `docs/architecture/02-mobile-poc.md` §4.3, navigables de bout en bout.
+3. Les 8 parcours de `docs/architecture/02-poc-pwa.md` §4.3, navigables de bout en bout.
 4. `packages/core` : règles de complétude du legs, modèle de permissions, machine d'activation (simulée).
-5. Chiffrement local réel (simple) + verrouillage par code/biométrie.
+5. Chiffrement local réel (WebCrypto, AES-256-GCM, DEK par document) + verrouillage par code applicatif.
 6. `MockAIProvider` + UX de l'assistant avec citations et badge « traitement local ».
 7. Export/import VEA fonctionnel (au moins en clair + chiffré par mot de passe).
 8. Jeu de données fictives (`tools/seed`).
-9. Tests : domaine, composants, 8 parcours E2E Maestro.
+9. Tests : domaine, composants, 8 parcours E2E Playwright, test hors ligne.
 10. **Compte rendu de tests utilisateurs** (≥ 5 personnes, dont ≥ 2 de plus de 65 ans).
 
 **Critères d'acceptation**
 - [ ] ≥ 80 % des testeurs terminent la création du document de legs **sans aide**.
 - [ ] Les testeurs expliquent correctement, avec leurs mots, ce que peut voir le contact de confiance.
-- [ ] Aucune requête réseau émise (test automatisé).
-- [ ] Aucun contenu en clair sur le disque (test automatisé).
-- [ ] Export → réinstallation → import : état identique.
+- [ ] Aucune requête réseau après le chargement initial, hors assets de même origine (test automatisé).
+- [ ] Aucun contenu en clair dans IndexedDB ni OPFS (test automatisé).
+- [ ] La KEK n'est présente dans aucun stockage de l'origine après déverrouillage (test automatisé).
+- [ ] L'application démarre et fonctionne **réseau coupé** après une première visite (test automatisé).
+- [ ] Export → réinstallation propre → import : état identique.
 - [ ] Aucune PII dans les logs (test automatisé).
-- [ ] CI verte : lint, typecheck, tests, gitleaks.
+- [ ] CI verte : lint, typecheck, tests, gitleaks, CSP.
+- [ ] Le bandeau « version d'évaluation — n'y déposez pas de vrais documents » est présent au démarrage.
 
-**Risques** — le POC part en production « parce qu'il marche » (⇒ bandeau « version d'évaluation » et
-refus explicite de publier) ; la complexité juridique dégrade l'UX ; l'attente d'une IA « ChatGPT ».
+**Risques** — le POC part en production « parce qu'il marche » : risque **aggravé** par le web, où
+publier ne demande qu'un lien (⇒ bandeau « version d'évaluation » et refus explicite de publier) ;
+la complexité juridique dégrade l'UX ; l'attente d'une IA « ChatGPT » ; éviction du stockage par le
+navigateur pendant une session de test (R26).
 
-**Dépendances** — réponses aux questions produit 1 à 3 ; recrutement des testeurs.
+**Dépendances** — réponses aux questions produit 1 à 3 ; recrutement des testeurs ; hébergement
+statique UE pour distribuer le lien.
 
 **Ne PAS faire** — backend, compte distant, synchronisation, vraie IA, vraie activation
-successorale, RBAC, publication sur les stores, optimisation de performance.
+successorale, RBAC, publication grand public, optimisation de performance, application native
+(c'est la Phase 3).
 
 ---
 
@@ -98,10 +108,14 @@ fournisseurs définitifs.
 
 **Objectifs** — construire la version réellement utilisable avec de vraies données.
 
-**Livrables** — SQLCipher + secure element + rotation ; IA on-device réelle (OCR, embeddings, RAG,
-génération) ; backend (auth, blobs, métadonnées) ; service d'activation + back-office de revue ;
-sauvegarde chiffrée et restauration ; IaC (dev/staging/prod) ; observabilité et audit ; pipeline de
-release mobile.
+**Plateforme** — passage à l'**application native** ([ADR-0002](../decisions/0002-react-native-expo.md)),
+à reconfirmer à la fin de la Phase 1 au vu des tests utilisateurs. `packages/core` est repris tel
+quel ; seuls les adapters et l'UI sont réécrits.
+
+**Livrables** — application native ; migration des données du POC ; SQLCipher + secure element +
+rotation ; IA on-device réelle (OCR, embeddings, RAG, génération) ; backend (auth, blobs,
+métadonnées) ; service d'activation + back-office de revue ; sauvegarde chiffrée et restauration ;
+IaC (dev/staging/prod) ; observabilité et audit ; pipeline de release mobile.
 
 **Critères d'acceptation**
 - [ ] Le serveur, compromis en environnement de test, ne livre aucun contenu lisible (démontré).
@@ -116,8 +130,9 @@ dérive de périmètre.
 
 **Dépendances** — Phase 2 validée, avis juridique rendu, hébergeur choisi.
 
-**Ne PAS faire** — fonctionnalités non validées en Phase 1, multi-plateforme web, partage social,
-provider IA cloud (sauf décision explicite).
+**Ne PAS faire** — fonctionnalités non validées en Phase 1, maintien en parallèle de la PWA de POC
+(elle est jetable : la garder vivante reviendrait à exposer une version sans protection matérielle
+des clés), partage social, provider IA cloud (sauf décision explicite).
 
 ---
 

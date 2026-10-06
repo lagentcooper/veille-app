@@ -2,6 +2,11 @@
 
 > Rien de ce document n'est à construire en Phase 1. Il existe pour garantir que les choix du POC
 > (ports/adapters, format d'export, modèle de permissions) mènent **quelque part**.
+>
+> Le POC de Phase 1 est une PWA ([ADR-0011](../decisions/0011-pwa-poc-phase-1.md)) ; la cible décrite
+> ici reste l'application native ([ADR-0002](../decisions/0002-react-native-expo.md)), à reconfirmer
+> à la fin de la Phase 1. Ce qui traverse les deux sans changer, ce sont les **contrats de ports** et
+> `packages/core` — c'est précisément ce que ce document sert à protéger.
 
 ---
 
@@ -10,7 +15,7 @@
 ```
 ┌──────────────────────────── APPAREIL DE L'UTILISATEUR (zone de confiance principale) ────────────────────────────┐
 │                                                                                                                 │
-│   UI (React Native)                                                                                             │
+│   UI (React Native — ADR-0002)                                                                                  │
 │     │                                                                                                           │
 │   Domain (règles legs, permissions, états d'activation)                                                         │
 │     │                                                                                                           │

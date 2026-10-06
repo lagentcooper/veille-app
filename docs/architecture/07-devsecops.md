@@ -39,13 +39,17 @@ production (approbation manuelle, déploiement progressif, rollback prêt)
 | Secrets | **Gitleaks** + GitHub push protection | Empêcher la fuite | Bloque avant le push | Faux positifs | Gratuit | TruffleHog |
 | Dépendances | **Dependabot** + **Grype** | CVE et mises à jour | Natif, PR groupées | Bruit | Gratuit | Renovate (plus configurable), Snyk (payant) |
 | SBOM | **Syft** (CycloneDX) | Inventaire | Standard ouvert, attachable à la release | À exploiter pour être utile | Gratuit | Trivy |
-| Mobile | **MobSF** (analyse d'artefact) | SAST mobile | Spécifique aux risques mobiles | Installation locale | Gratuit | NowSecure (payant) |
+| Web (Phase 1) | **Lighthouse CI** | Audit PWA, accessibilité, bonnes pratiques | Mesure l'installabilité, le hors-ligne et l'accessibilité au lieu de les supposer | Seuils à calibrer pour éviter le bruit | Gratuit | `pa11y`, `axe-core` seuls |
+| Web (Phase 1) | **CSP + `Permissions-Policy`** servies par l'hébergeur statique | Réduction de surface | Neutralise la classe d'attaque principale du POC (R25) | À tenir à jour à chaque nouvelle ressource | Gratuit | CSP en `<meta>` (plus faible) |
+| Mobile (Phase 3+) | **MobSF** (analyse d'artefact) | SAST mobile | Spécifique aux risques mobiles | Installation locale | Gratuit | NowSecure (payant) |
 | Conteneurs (Phase 3) | **Trivy** | Scan images/IaC | Rapide, polyvalent | — | Gratuit | Grype + Checkov |
 | IaC | **Terraform** + **Checkov**/**tfsec** | Infra as code + contrôle | Reproductible, revu en PR | Courbe d'apprentissage | Gratuit (Terraform OSS/OpenTofu) | Pulumi, OpenTofu |
 | DAST (Phase 4) | **OWASP ZAP** | Test dynamique API | Gratuit, automatisable | Faux positifs, à cadrer | Gratuit | Burp Suite Pro (~450 €/an) |
 | Secrets runtime | **KMS + gestionnaire de secrets du cloud** | Stockage/rotation | Intégré, tracé | Verrouillage fournisseur | À l'usage | HashiCorp Vault (auto-hébergé) |
-| E2E mobile | **Maestro** | Parcours utilisateur | Simple, YAML lisible | Moins puissant que Detox | Gratuit | Detox |
-| Build/distribution | **EAS Build** (Expo) | Builds signés, stores | Gère la signature et les stores | Coût, dépendance Expo | ~30–100 $/mois | Fastlane auto-hébergé |
+| E2E web (Phase 1) | **Playwright** | Parcours utilisateur | Vrai navigateur : teste aussi le service worker, le stockage et l'absence de requête sortante | Suites lentes si mal cadrées | Gratuit | Cypress |
+| E2E mobile (Phase 3+) | **Maestro** | Parcours utilisateur | Simple, YAML lisible | Moins puissant que Detox | Gratuit | Detox |
+| Distribution (Phase 1) | **Hébergement statique UE** | Servir la PWA | Aucun backend, aucune donnée utilisateur ne transite ; un lien suffit au testeur | L'hébergeur voit les adresses IP | Gratuit à faible | Auto-hébergement |
+| Build/distribution (Phase 3+) | **EAS Build** (Expo) | Builds signés, stores | Gère la signature et les stores | Coût, dépendance Expo | ~30–100 $/mois | Fastlane auto-hébergé |
 | Observabilité | **OpenTelemetry** + Grafana/Loki/Tempo | Logs, métriques, traces | Standard ouvert, portable | À opérer | Gratuit (auto-hébergé) | Datadog (cher), Grafana Cloud |
 | Erreurs | **Sentry auto-hébergé (UE)** | Crash reporting opt-in | Contrôle des données | Exploitation | Gratuit/à l'usage | Bugsnag |
 
@@ -73,6 +77,7 @@ production (approbation manuelle, déploiement progressif, rollback prêt)
 - Vulnérabilité **critique/haute** exploitable dans une dépendance utilisée
 - PII détectée dans les logs
 - Absence de test sur un chemin critique modifié (crypto, permissions, activation, export, suppression)
+- Requête vers une origine tierce détectée pendant les tests, ou CSP affaiblie (Phase 1)
 - ADR manquant pour une décision structurante
 - CODEOWNERS sécurité non approuvé sur un chemin sensible
 
@@ -82,7 +87,7 @@ production (approbation manuelle, déploiement progressif, rollback prêt)
 
 | Phase | DevSecOps en place |
 |-------|--------------------|
-| **1 (POC)** | Branch protection, PR, lint, typecheck, tests unitaires, Gitleaks, Dependabot, PR template avec checklist DoD. **C'est tout** — le reste serait du bruit. |
+| **1 (POC)** | Branch protection, PR, lint, typecheck, tests unitaires, Gitleaks, Dependabot, PR template avec checklist DoD. Plus, parce que le POC est web : **vérification de la CSP**, **test hors ligne**, **assertion « aucune requête sortante »**. **C'est tout** — le reste serait du bruit. |
 | **2** | + Semgrep (règles maison privacy/IA), SBOM, tests E2E, tests de migration |
 | **3** | + IaC + Checkov, environnements séparés, OIDC, KMS, déploiement progressif, sauvegardes |
 | **4** | + DAST, MobSF, pentest externe, exercice de restauration, revue de conformité |

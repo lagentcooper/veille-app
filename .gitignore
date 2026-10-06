@@ -1,0 +1,27 @@
+# Secrets — AGENTS.md §5.1: never commit a filled .env, only .env.example
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output and caches
+dist/
+build/
+coverage/
+.turbo/
+*.tsbuildinfo
+
+# Test and user data — AGENTS.md §10: never commit a real user document
+tmp/
+*.log
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json

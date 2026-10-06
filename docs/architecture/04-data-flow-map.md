@@ -8,7 +8,7 @@
 Utilisateur
    │  saisit / photographie
    ▼
-UI ──► Domain ──► Local Store (SQLite chiffré + fichiers chiffrés)
+UI ──► Domain ──► Local Store (Phase 1 : IndexedDB + OPFS chiffrés — Phase 3 : SQLCipher + fichiers chiffrés)
    │                    ▲
    │                    │ lecture pour affichage
    └──► MockAIProvider ─┘   (aucune sortie réseau)
@@ -113,11 +113,15 @@ Contrôles à chaque frontière : voir `docs/security/02-trust-boundaries.md`.
 
 | Couche | Dépendance | Criticité | Risque | Mitigation |
 |--------|-----------|-----------|--------|------------|
-| Mobile | React Native / Expo | Haute | Rupture de version, obsolescence | Versions LTS, mises à jour planifiées, dev build maîtrisé |
-| Mobile | SQLite / SQLCipher | Haute | Vulnérabilité, licence | Format ouvert, alternative possible (Realm) ; suivi CVE |
-| Mobile | Keychain / Keystore (OS) | **Critique** | Dépendance matérielle, appareils anciens | Détection de capacité + dégradation documentée (refus de la fonction plutôt que baisse silencieuse de sécurité) |
-| Mobile | Runtime IA on-device | Moyenne | Écosystème mouvant | Abstraction `AIProvider` (ADR-0004) |
-| Mobile | Stores Apple/Google | **Critique** | Rejet, retrait, politique | Conformité aux guidelines, plan de communication |
+| Web (Phase 1) | Navigateur (moteur, WebCrypto, IndexedDB, OPFS) | **Critique** | Divergences entre moteurs, éviction du stockage, évolution des API | Cibles explicites testées en CI (Chromium + WebKit) ; persistance demandée et affichée (R26) |
+| Web (Phase 1) | Service worker | **Critique** | Code privilégié : sert toute l'origine | Dossier isolé, CODEOWNERS sécurité, revue obligatoire, pas de `skipWaiting` silencieux (R28) |
+| Web (Phase 1) | Hébergement statique | **Critique** | Compromission ⇒ version piégée persistante | Déploiement depuis la CI uniquement, accès MFA, hébergeur UE (R28) |
+| Web (Phase 1) | React + Vite | Haute | Rupture de version | Versions épinglées, mises à jour planifiées |
+| Mobile (Phase 3+) | React Native / Expo | Haute | Rupture de version, obsolescence | Versions LTS, mises à jour planifiées, dev build maîtrisé |
+| Mobile (Phase 3+) | SQLite / SQLCipher | Haute | Vulnérabilité, licence | Format ouvert, alternative possible (Realm) ; suivi CVE |
+| Mobile (Phase 3+) | Keychain / Keystore (OS) | **Critique** | Dépendance matérielle, appareils anciens | Détection de capacité + dégradation documentée (refus de la fonction plutôt que baisse silencieuse de sécurité) |
+| Mobile (Phase 3+) | Runtime IA on-device | Moyenne | Écosystème mouvant | Abstraction `AIProvider` (ADR-0004) |
+| Mobile (Phase 3+) | Stores Apple/Google | **Critique** | Rejet, retrait, politique | Conformité aux guidelines, plan de communication |
 | Backend | Cloud UE | Haute | Verrouillage, disponibilité | IaC portable, données en formats ouverts, sortie testée |
 | Backend | Fournisseur email/SMS | Haute (activation) | Non-délivrance, fuite de métadonnées | Multi-canal, fournisseur UE, contenu minimal |
 | CI | GitHub Actions | Haute | Compromission d'action | Épinglage par SHA, permissions minimales, OIDC |
