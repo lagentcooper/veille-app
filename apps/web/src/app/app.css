@@ -1,0 +1,38 @@
+.app-banner {
+  padding: var(--v-space-2) var(--v-space-3);
+  background: var(--v-color-banner-bg);
+  color: var(--v-color-banner-text);
+  font-size: var(--v-font-size-small);
+  text-align: center;
+}
+.app-main {
+  max-width: var(--v-measure);
+  margin: 0 auto;
+  padding: var(--v-space-4) var(--v-space-3) var(--v-space-5);
+}
+.app-main:focus {
+  outline: none;
+}
+.app-skip {
+  position: absolute;
+  inset-inline-start: var(--v-space-2);
+  top: -4rem;
+  padding: var(--v-space-2) var(--v-space-3);
+  background: var(--v-color-bg);
+  color: var(--v-color-text);
+  z-index: 10;
+}
+.app-skip:focus {
+  top: var(--v-space-2);
+}
+a {
+  color: var(--v-color-primary);
+  display: inline-block;
+  min-height: var(--v-target-min);
+  padding-block: var(--v-space-2);
+}
+summary {
+  min-height: var(--v-target-min);
+  padding-block: var(--v-space-2);
+  cursor: pointer;
+}
