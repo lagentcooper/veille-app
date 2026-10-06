@@ -1,7 +1,7 @@
 # Current Progress
 
 > Mis à jour à chaque tâche significative. **Aucune donnée personnelle, aucun secret ici.**
-> Dernière mise à jour : 2026-10-06 — session *Web/UX* (Session A, `feature/poc-shell`).
+> Dernière mise à jour : 2026-10-06 — session *Web* (Session C, `feature/will-poc`).
 
 ## Completed
 
@@ -55,6 +55,36 @@
   - Workflows : `ci.yml` (lint, types, unitaires, build, E2E) et `deploy-pages.yml` (déploiement sur
     `main` puis E2E rejoués **contre l'URL Pages**).
 
+- **Session B — domaine legs** (`feature/will-domain`, mergée dans `pre`) : `packages/core/src/will/**`,
+  trois objets distincts, versions chaînées par hash, moteur de complétude à trois niveaux, neuf cas
+  bloquants, validation d'entrée stricte, sérialisation VEA du legs. 97 tests.
+
+- **Session C — parcours Legs** (branche `feature/will-poc`, PR vers `pre`)
+  - **Completed** : assistant pas-à-pas **une question par écran** (brouillon : 13 à 20 écrans selon les
+    réponses ; volontés ; emplacement du testament manuscrit), sauvegarde automatique à chaque saisie,
+    reprise là où l'on s'était arrêté, écran « Faire le point » (✅ / ⚠️ / 🛑, orientation vers le notaire
+    présentée comme la dernière étape), export de **deux PDF distincts** (jamais fusionnés), historique
+    des versions consultable, avertissement permanent et non masquable sur tous les écrans `/legs`.
+  - **Chiffrement réel** : AES-256-GCM, une DEK par objet, DEK enveloppée par la KEK (Argon2id, jamais
+    persistée), sujet authentifié (AAD) : un enregistrement déplacé est refusé ; l'historique est
+    revérifié (chaîne de hash) à chaque lecture ; un enregistrement illisible n'est jamais écrasé.
+  - **Current State** : tout est local ; aucune requête réseau pendant le parcours (test E2E).
+  - **Files Changed** : `apps/web/src/features/will/**` (domain, data, ui), `apps/web/src/i18n/will-fr.ts`,
+    `apps/web/src/adapters/sha256-hasher.ts`, `apps/web/e2e/will*.ts`, `packages/ui` (ChoiceGroup,
+    TextArea, Checkbox, Progress, style des liens-boutons), alias `@veille/core/will`, petites retouches
+    à `App.tsx`, `main.tsx`, `HomeScreen.tsx`, `profile-service.ts` (export de `KEK_ALIAS`).
+    Docs : threat model (R31), classification (PDF exportés), matrice de tests.
+  - **Decisions** : (1) PDF sans dépendance, écrit à la main (texte, polices Courier intégrées au
+    format PDF) — une dépendance de moins à auditer ; (2) le texte à recopier n'est **pas** proposé tant
+    qu'un cas 🛑 ou une information manquante subsiste ; (3) une version est enregistrée quand on termine
+    une partie et à chaque export, pas à chaque frappe ; (4) le contenu d'un PDF téléchargé sort du
+    périmètre chiffré : avertissement affiché (R31).
+  - **Tests** : 130 tests unitaires/composants `@veille/web` + 8 `@veille/ui` ; E2E Playwright (voir PR) ;
+    mutation vérifiée : remplacer le chiffrement par du clair fait échouer le test de stockage.
+  - **Known Issues** : voir « Known Issues » ci-dessous (domaine legs, CI, juridique).
+  - **Next Action** : tests utilisateurs du parcours (≥ 5 personnes dont ≥ 2 de plus de 65 ans) ; faire
+    relire par un juriste les textes marqués ⚖️ (`apps/web/src/i18n/will-fr.ts`).
+
 ## In Progress
 
 - **Phase 1 — POC UX/UI en PWA.** Phase ouverte : l'architecture est validée (D22) et la plateforme
@@ -99,8 +129,7 @@ critères de fin — dans [`docs/product/05-briefs-sessions.md`](product/05-brie
 2. **Session B — `feature/will-domain`**, en parallèle de A (aucun fichier partagé) : règles métier du
    legs en TypeScript pur — `WillDraft` / `WishesDocument` / `PhysicalWillRecord`, versions immuables,
    moteur de complétude, cas bloquants « voir un notaire », sérialisation VEA.
-3. **Session C — `feature/will-poc`**, après merge de A et B : assemblage des écrans du parcours de
-   legs, chiffrement WebCrypto réel, deux PDF distincts, E2E Playwright.
+3. ~~**Session C — `feature/will-poc`**~~ : livrée en PR (voir Completed).
 4. **Tests utilisateurs du parcours de legs** (≥ 5 personnes dont ≥ 2 de plus de 65 ans) — c'est
    l'objet même de la Phase 1. **Ne pas ouvrir d'autre chantier avant.**
 5. Trancher les décisions 🔴 restantes (D1, D2, D3, D8, D9, D25). **D2 tranchée** : option (c), trois
@@ -132,3 +161,15 @@ le porteur a restreint le POC au seul document de legs.*
 - Les deux conflits signalés précédemment par la session QA (incohérence de phase dans `AGENTS.md` §2,
   et piste PWA contredisant ADR-0002) sont **résolus** : le porteur a tranché, la documentation est
   alignée et ADR-0011 porte la décision.
+- **Parcours legs — points à traiter, non corrigés par la session C (hors de son périmètre)** :
+  - `packages/core` n'a pas de `package.json` : les tests du domaine legs (`packages/core/tests/**`) ne
+    sont **pas exécutés par la CI**. À brancher (session A / QA).
+  - Un utilisateur qui répond « Je ne sais pas » à une question reste ⚠️ indéfiniment : le domaine ne
+    distingue pas « pas encore répondu » de « ne sait pas ». À arbitrer (produit + domaine).
+  - Marié sans enfant : deux 🛑 pour la même personne (héritier réservataire *et* régime matrimonial).
+  - L'avertissement « mot de passe » ne couvre ni l'intitulé des papiers ni la description des volontés.
+  - ⚖️ Les textes en langage courant (cas bloquants, mode d'emploi manuscrit, formule d'ouverture du
+    texte à recopier, avertissements) n'ont **pas** été relus par un juriste.
+  - Le PDF est en Courier (police intégrée) : lisible, mais non « tagué » pour les lecteurs d'écran.
+  - La mesure « moins de 15 minutes sans aide » ne peut être démontrée que par les tests utilisateurs ;
+    l'E2E ne mesure que la longueur du parcours (nombre d'écrans).
