@@ -25,18 +25,27 @@ const sources = readdirSync(SRC)
 
 describe('purity of packages/core/src/will (AGENTS.md §4)', () => {
   it('imports no framework, no Node module and no browser API', () => {
+    let seen = 0;
     for (const { file, text: raw } of sources) {
-      const imports = [...raw.matchAll(/from\s+'([^']+)'/g)].map((m) => m[1]!);
+      // Quote-agnostic on purpose: matching only 'single' quotes would make every assertion
+      // below vacuous the day Prettier rewrites this package to double quotes.
+      const imports = [...raw.matchAll(/from\s+["']([^"']+)["']/g)].map((m) => m[1]!);
+      seen += imports.length;
       // Inspect code only: comments and string literals may legitimately mention these words.
       const text = raw
         .replace(/\/\*[\s\S]*?\*\//g, '')
         .replace(/\/\/.*$/gm, '')
-        .replace(/'(?:[^'\\\n]|\\.)*'|`(?:[^`\\]|\\.)*`/g, "''");
+        .replace(/'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|`(?:[^`\\]|\\.)*`/g, "''");
       for (const i of imports) expect(i.startsWith('.'), `${file} imports ${i}`).toBe(true);
       expect(text, file).not.toMatch(/\b(window|document|indexedDB|localStorage|sessionStorage|navigator|globalThis\.crypto)\b/);
       expect(text, file).not.toMatch(/(?<![.\w])crypto\./);
       expect(text, file).not.toMatch(/\bDate\.now\(|new Date\(\)|Math\.random\(|console\./);
     }
+    // Guards the guard: if the import regex ever stops matching the source's quote style, the
+    // loop above would pass while checking nothing at all.
+    expect(seen, 'no import detected across the whole domain — the regex is blind').toBeGreaterThan(
+      10,
+    );
   });
 });
 
