@@ -1,8 +1,8 @@
-import { worstLevel, type Assessment, type AssessmentLevel } from './findings';
-import type { PhysicalWillRecord, WillDraft, WishesDocument } from './model';
-import { assessPhysicalWillRecord } from './rules-physical-record';
-import { assessWillDraft } from './rules-draft';
-import { assessWishesDocument } from './rules-wishes';
+import { worstLevel, type Assessment, type AssessmentLevel } from "./findings";
+import type { PhysicalWillRecord, WillDraft, WishesDocument } from "./model";
+import { assessPhysicalWillRecord } from "./rules-physical-record";
+import { assessWillDraft } from "./rules-draft";
+import { assessWishesDocument } from "./rules-wishes";
 
 export interface WillDossier {
   draft?: WillDraft;
