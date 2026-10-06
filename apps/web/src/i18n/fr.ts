@@ -4,6 +4,7 @@ import { willFr } from "./will-fr";
 export const fr = {
   will: willFr,
   app: {
+    name: "Veille",
     skipToContent: "Aller au contenu",
     loading: "Chargement…",
   },
@@ -16,6 +17,8 @@ export const fr = {
     intro:
       "Veille vous aide à écrire vos volontés et à les mettre à l'abri, simplement, à votre rythme.",
     local: "Tout reste sur cet appareil. Il n'y a ni compte, ni adresse e-mail à créer.",
+    guided:
+      "Une question à la fois, à votre rythme. Vous pouvez vous arrêter et reprendre plus tard.",
     notLawyer:
       "Veille ne remplace pas un notaire ni un avocat. Elle vous aide à vous organiser et vous dit quand il vaut mieux consulter un professionnel.",
     start: "Commencer",

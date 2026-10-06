@@ -21,6 +21,36 @@ export const willFr = {
     consultNotary: "Faire relire votre document par un notaire est la meilleure précaution.",
   },
 
+  /**
+   * ⚖️ **VALIDATION JURIDIQUE REQUISE** — plain-language definitions of "testament" and "legs" and of
+   * what the law reserves. Written by a developer from general knowledge, not reviewed by a lawyer.
+   */
+  explainer: {
+    title: "Legs, testament : quelle différence ?",
+    intro: "Deux mots qu'on confond souvent. Voici leur sens, simplement.",
+    testament: {
+      term: "Un testament",
+      text: "C'est le document que vous écrivez pour dire ce que deviennent vos biens après votre décès. Le plus courant est écrit en entier à la main, daté et signé.",
+    },
+    legacy: {
+      term: "Un legs",
+      text: "C'est ce que vous laissez à une personne ou à un organisme dans votre testament. Par exemple : « Je laisse ma montre à ma nièce. » Un legs se fait donc dans un testament, pas à côté.",
+    },
+    wishes: {
+      term: "Vos volontés hors testament",
+      text: "Vos souhaits pour les obsèques, vos messages, l'endroit où sont vos papiers. C'est précieux pour vos proches, mais ce n'est pas un testament : cela ne partage pas vos biens.",
+    },
+    inVeille: {
+      title: "Dans Veille",
+      draft:
+        "Le brouillon prépare le texte de votre testament, avec vos legs. Vous le recopiez ensuite à la main.",
+      wishes: "Vos volontés forment une partie à part.",
+      record: "Si vous avez déjà un testament, vous indiquez seulement où il est rangé.",
+    },
+    law: "Sans testament, la loi prévoit elle-même qui hérite. Et même avec un testament, elle réserve une part à certains proches : c'est pourquoi un notaire doit regarder certaines situations.",
+    footnote: "Explication générale, en langage courant. Ce n'est pas un conseil juridique.",
+  },
+
   guide: {
     title: "Comment faire pour que votre testament compte",
     writeEverythingByHand:
@@ -378,7 +408,9 @@ export const willFr = {
 
   review: {
     title: "Faire le point",
-    intro: "Voici où en est chaque partie de votre dossier, selon notre checklist.",
+    intro:
+      "Voici où vous en êtes, partie par partie. Ce n'est qu'un contrôle de ce qui manque : rien n'est vérifié par un professionnel.",
+    summaryTitle: "En un coup d'œil",
     objects: {
       draft: "Brouillon de testament",
       wishes: "Mes volontés",
@@ -386,9 +418,38 @@ export const willFr = {
     },
     allComplete:
       "Tout est complet selon notre checklist. Ce n'est pas un avis juridique : ce que vous avez écrit n'a pas été vérifié par un professionnel.",
-    somethingMissing: "Il reste des points à compléter.",
+    somethingMissing:
+      "Il reste des réponses à donner. Chaque partie ci-dessous vous dit précisément lesquelles.",
     noFindings: "Rien à signaler pour cette partie.",
+    notStarted: "Vous n'avez pas encore commencé cette partie.",
     levelLabel: "État",
+    legend: {
+      title: "Que veulent dire ces étiquettes ?",
+      complete: "Toutes les informations demandées sont renseignées.",
+      incomplete:
+        "Il manque des réponses. Rien de grave : il suffit de répondre aux questions listées.",
+      professional:
+        "Votre situation dépend de règles que Veille ne peut pas trancher. Un notaire doit vous aider.",
+      notStarted: "Vous n'avez pas encore ouvert cette partie.",
+    },
+    progress: "{{done}} réponses sur {{total}}",
+    meterLabel: "Réponses données",
+    toAnswer: {
+      title: "Réponses manquantes : {{count}}",
+      hint: "Répondre à ces questions suffit à compléter cette partie.",
+      action: "Répondre",
+      actionFor: "Répondre à : {{question}}",
+      more: "Voir les {{count}} autres questions",
+    },
+    toCheck: {
+      title: "À vérifier",
+      hint: "Ces points demandent un coup d'œil de votre part.",
+    },
+    blocking: {
+      title: "À voir avec un professionnel",
+      hint: "Vous pouvez modifier votre réponse, mais seul un notaire peut dire ce qui est possible dans votre situation.",
+    },
+    continue: "Continuer cette partie",
     notary: {
       title: "Dernière étape : faire relire chez un notaire",
       recommended:
