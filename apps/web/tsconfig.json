@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["node", "vite/client", "vitest/globals", "@testing-library/jest-dom"],
+    "paths": { "@veille/core/ports": ["../../packages/core/src/ports/index.ts"] }
+  },
+  "include": ["src", "vite", "vite.config.ts", "vitest.config.ts"]
+}
