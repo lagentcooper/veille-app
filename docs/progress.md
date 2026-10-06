@@ -1,7 +1,7 @@
 # Current Progress
 
 > Mis à jour à chaque tâche significative. **Aucune donnée personnelle, aucun secret ici.**
-> Dernière mise à jour : 2026-10-06 — sessions *Web* (Session C) et *QA*, intégrées ensemble.
+> Dernière mise à jour : 2026-10-06 — sessions *Web* (C), *QA* et *UX/UI*, intégrées ensemble.
 
 ## Completed
 
@@ -84,6 +84,18 @@
   - **Known Issues** : voir « Known Issues » ci-dessous (domaine legs, CI, juridique).
   - **Next Action** : tests utilisateurs du parcours (≥ 5 personnes dont ≥ 2 de plus de 65 ans) ; faire
     relire par un juriste les textes marqués ⚖️ (`apps/web/src/i18n/will-fr.ts`).
+
+- **Contraste des boutons — correctif** (session *UX/UI*, branche `fix/disabled-contrast`)
+  - **Cause réelle de la CI rouge** (`will.spec.ts:353`, ligne 377, écran « ajouter un message ») : la
+    transition `background-color 0,15 s` des boutons. React réutilise le même `<button>` d'un écran à
+    l'autre en changeant sa variante (primaire → secondaire) ; l'audit axe, lancé pendant ces 150 ms,
+    mesure un fond à moitié fondu : **2,76:1** (`#1f4e8c` sur `#7b97bc`) dans le log de CI. Reproduit en
+    allongeant la transition à 8 s (1,04:1 sur ce même écran). Transition supprimée.
+  - `opacity: 0.6` des boutons désactivés remplacé par des jetons explicites : blanc sur `#646b78`
+    (5,36:1) pour le primaire ; `#5d6475` sur blanc (5,92:1) et sur surface (5,39:1) pour le secondaire.
+    `aria-disabled` conservé, survol neutralisé. Champ désactivé aligné.
+  - Gardes : `packages/ui/tests/tokens.test.ts` (ratios ≥ 4,5:1, aucune `opacity`, aucune `transition`)
+    et un E2E sur la durée de transition des boutons.
 
 - **Câblage de `packages/core` et hygiène** (session *QA*, branche `fix/core-workspace-wiring`)
   - **Les 97 cas du domaine legs n'étaient exécutés par rien.** `packages/core` n'avait pas de
