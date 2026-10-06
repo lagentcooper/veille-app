@@ -7,6 +7,8 @@ export default defineConfig({
     alias: {
       "@veille/core/ports": new URL("../../packages/core/src/ports/index.ts", import.meta.url)
         .pathname,
+      "@veille/core/will": new URL("../../packages/core/src/will/index.ts", import.meta.url)
+        .pathname,
     },
   },
   test: {

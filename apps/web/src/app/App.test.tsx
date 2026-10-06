@@ -6,7 +6,13 @@ import { MemoryKeyStore } from "../adapters/memory-key-store";
 import { ProfileService } from "../features/profile/data/profile-service";
 import { initI18n } from "../i18n";
 import { fr } from "../i18n/fr";
-import { FakeClock, FakeCrypto, MemoryStorage, RecordingLogger } from "../test/doubles";
+import {
+  FakeClock,
+  FakeCrypto,
+  MemoryStorage,
+  RecordingLogger,
+  willServices,
+} from "../test/doubles";
 import { App } from "./App";
 import { SessionProvider } from "./session";
 
@@ -26,17 +32,19 @@ beforeAll(async () => {
 function setup(path = "/") {
   const storage = new MemoryStorage();
   const clock = new FakeClock();
+  const keys = new MemoryKeyStore();
+  const crypto = new FakeCrypto();
   const profiles = new ProfileService({
     storage,
-    crypto: new FakeCrypto(),
-    keys: new MemoryKeyStore(),
+    crypto,
+    keys,
     clock,
     logger: new RecordingLogger(),
   });
   const view = render(
     <MemoryRouter initialEntries={[path]}>
       <SessionProvider profiles={profiles} storage={storage}>
-        <App update={null} />
+        <App update={null} will={willServices({ storage, crypto, keys, clock })} />
       </SessionProvider>
     </MemoryRouter>,
   );
@@ -146,17 +154,19 @@ describe("lock and unlock", () => {
     await createProfile(user);
     first.unmount();
     const storage = first.storage;
+    const keys = new MemoryKeyStore();
+    const crypto = new FakeCrypto();
     const profiles = new ProfileService({
       storage,
-      crypto: new FakeCrypto(),
-      keys: new MemoryKeyStore(),
+      crypto,
+      keys,
       clock: first.clock,
       logger: new RecordingLogger(),
     });
     render(
       <MemoryRouter>
         <SessionProvider profiles={profiles} storage={storage}>
-          <App update={null} />
+          <App update={null} will={willServices({ storage, crypto, keys, clock: first.clock })} />
         </SessionProvider>
       </MemoryRouter>,
     );
@@ -241,17 +251,20 @@ describe("Where is my data?", () => {
   it("states when the browser cannot say", async () => {
     const storage = new MemoryStorage();
     storage.persistenceState = "unsupported";
+    const keys = new MemoryKeyStore();
+    const crypto = new FakeCrypto();
+    const clock = new FakeClock();
     const profiles = new ProfileService({
       storage,
-      crypto: new FakeCrypto(),
-      keys: new MemoryKeyStore(),
-      clock: new FakeClock(),
+      crypto,
+      keys,
+      clock,
       logger: new RecordingLogger(),
     });
     render(
       <MemoryRouter initialEntries={["/donnees"]}>
         <SessionProvider profiles={profiles} storage={storage}>
-          <App update={null} />
+          <App update={null} will={willServices({ storage, crypto, keys, clock })} />
         </SessionProvider>
       </MemoryRouter>,
     );
