@@ -36,3 +36,40 @@ summary {
   padding-block: var(--v-space-2);
   cursor: pointer;
 }
+
+/* Will journey */
+.will-status {
+  font-weight: 600;
+}
+.will-findings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--v-space-3);
+  margin: 0;
+  padding-inline-start: 0;
+  list-style: none;
+}
+.will-save {
+  margin: 0;
+  color: var(--v-color-text-muted);
+  font-size: var(--v-font-size-small);
+}
+.will-versions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--v-space-2);
+  margin: 0;
+  padding-inline-start: 0;
+  list-style: none;
+}
+.will-versions dt {
+  font-weight: 600;
+}
+.will-versions dd {
+  margin: 0 0 var(--v-space-2);
+}
+.will-disclaimer {
+  margin: 0;
+  font-size: var(--v-font-size-small);
+  line-height: 1.45;
+}

@@ -6,9 +6,13 @@ import type {
   Logger,
   LogFields,
   PersistenceState,
+  SecureKeyStore,
   StorageProvider,
   StorageUsage,
 } from "@veille/core/ports";
+import { IsoClock, WebCryptoHasher } from "../adapters/sha256-hasher";
+import { WillRepository } from "../features/will/data/will-repository";
+import type { WillServices } from "../features/will/ui/WillWorkspace";
 
 export class MemoryStorage implements StorageProvider {
   readonly data = new Map<string, Uint8Array>();
@@ -102,4 +106,19 @@ export class FakeCrypto implements CryptoProvider {
     const head = payload.ciphertext.slice(0, tag.length);
     return head.every((b, i) => b === tag[i]) ? payload.ciphertext.slice(tag.length) : null;
   }
+}
+
+/** Will services over the given doubles; real hashing (SHA-256 is instant). */
+export function willServices(deps: {
+  storage: StorageProvider;
+  crypto: CryptoProvider;
+  keys: SecureKeyStore;
+  clock: Clock;
+}): WillServices {
+  const hasher = new WebCryptoHasher();
+  return {
+    repository: new WillRepository({ ...deps, hasher, logger: new RecordingLogger() }),
+    env: { clock: new IsoClock(), hasher },
+    clock: deps.clock,
+  };
 }

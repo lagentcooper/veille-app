@@ -27,6 +27,7 @@
 | Hash + horodatage de version | C1 | Intégrité | Appareil (+ audit) | — (non réversible) | Longue |
 | Statut de complétude, alertes déclenchées | C1 | Parcours | Appareil | Base chiffrée | Idem |
 | Emplacement déclaré du testament manuscrit | C3 | Aider les héritiers | Appareil | Chiffré | Idem |
+| **PDF exportés** (brouillon à recopier ; document de volontés) | **C3** | Recopie manuscrite, remise à un notaire ou à des proches | **Fichier téléchargé par l'utilisateur, hors du stockage de Veille** | **Aucun** (fichier en clair — avertissement affiché, R31) | Choix de l'utilisateur ; Veille ne peut pas les supprimer |
 
 ### Documents justificatifs
 

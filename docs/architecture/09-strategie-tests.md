@@ -29,8 +29,8 @@ les tests de `packages/core`, eux, ne changent pas — ils ne dépendent d'aucun
 | Fonctionnalité | Unit | Integration | E2E | Security | Privacy |
 |----------------|------|-------------|-----|----------|---------|
 | Profil local / verrouillage | ✅ règles de session | ✅ dérivation et détention de la KEK | ✅ création + verrouillage | ✅ verrouillage à la perte de visibilité, échecs de code, **KEK jamais persistée** | ✅ aucune donnée hors appareil |
-| Document de legs — rédaction | ✅ complétude, cohérence | ✅ persistance chiffrée | ✅ parcours complet | ⚪ | ✅ pas de log de contenu |
-| Document de legs — validation | ✅ **règles de blocage (notaire requis)** | ✅ | ✅ écran de contrôle | ⚪ | ⚪ |
+| Document de legs — rédaction | ✅ complétude, cohérence, enchaînement des écrans | ✅ persistance chiffrée (AES-256-GCM, DEK par document, sujet authentifié) | ✅ parcours complet | ✅ **aucun texte en clair** dans IndexedDB/OPFS/Web Storage/cache, **KEK introuvable** dans le stockage (E2E) | ✅ pas de log de contenu |
+| Document de legs — validation | ✅ **règles de blocage (notaire requis)** | ✅ | ✅ écran de contrôle, PDF refusé si 🛑 | ⚪ | ✅ avertissement sur les PDF en clair (R31) |
 | Historique des versions | ✅ immuabilité, hash | ✅ | ✅ consultation | ✅ non-altérabilité | ⚪ |
 | Import de document | ✅ validation de type/taille | ✅ chiffrement effectif | ✅ photo + fichier | ✅ **fichier malveillant, chemin, taille** | ✅ pas de nom de fichier logué |
 | Consultation / recherche | ✅ filtres | ✅ index | ✅ trouver en < 15 s | ✅ pas d'accès hors périmètre | ⚪ |
