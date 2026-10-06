@@ -12,8 +12,9 @@
     "test": "turbo run test",
     "lint": "eslint .",
     "lint:isolation": "pnpm --filter @veille/config test",
-    "format": "prettier --ignore-path packages/config/prettierignore --write apps packages package.json turbo.json tsconfig.base.json",
-    "format:check": "prettier --ignore-path packages/config/prettierignore --check apps packages package.json turbo.json tsconfig.base.json"
+    "format": "prettier --ignore-path packages/config/prettierignore --write apps packages/ui packages/config packages/core/src/ports package.json turbo.json tsconfig.base.json",
+    "format:check": "prettier --ignore-path packages/config/prettierignore --check apps packages/ui packages/config packages/core/src/ports package.json turbo.json tsconfig.base.json",
+    "//format": "Session B's code (packages/core/src/will, packages/core/tests) is deliberately not listed: format it in its own PR, then add packages/core here."
   },
   "devDependencies": {
     "turbo": "^2.5.0",

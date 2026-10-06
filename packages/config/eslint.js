@@ -86,6 +86,11 @@ export default [
         { "ts-ignore": true, "ts-expect-error": "allow-with-description" },
       ],
       "@typescript-eslint/no-explicit-any": "error",
+      // A leading underscore marks an intentionally unused binding (e.g. omitted destructured keys).
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { varsIgnorePattern: "^_", argsIgnorePattern: "^_" },
+      ],
     },
   },
   {
