@@ -146,14 +146,21 @@ pre           ← BRANCHE D'INTÉGRATION : toutes les sessions y convergent
   (`git fetch origin && git checkout -b feature/<sujet> origin/pre`) et ouvre sa PR **vers `pre`**,
   jamais vers `main`.
 - `main` ne reçoit que des promotions depuis `pre`, une fois l'ensemble cohérent et testé.
-- **Après chaque promotion, refusionner `main` dans `pre` dans la même séance :**
-  ```bash
-  git fetch origin && git checkout pre && git merge origin/main && git push origin pre
-  ```
-  Sans cela les deux branches divergent **à chaque fois**, et pas pour une raison de contenu : la
-  fusion d'une PR crée un commit de merge qui n'existe que sur `main`. `main` cesse donc d'être un
-  ancêtre de `pre`, la promotion suivante n'est plus une avance linéaire, et chaque session suivante
-  croit à un conflit réel. Deux commandes de plus, et le problème disparaît.
+- **Après chaque promotion, refusionner `main` dans `pre` dans la même séance.** Sans cela les deux
+  branches divergent **à chaque fois**, et pas pour une raison de contenu : la fusion d'une PR crée un
+  commit de merge qui n'existe que sur `main`. `main` cesse donc d'être un ancêtre de `pre`, la
+  promotion suivante n'est plus une avance linéaire, et chaque session suivante croit à un conflit réel.
+
+  Le retour n'apporte **aucun contenu nouveau** : les deux côtés ont déjà passé la CI. Deux voies,
+  selon qui opère (voir §8 bis) :
+
+  | Qui | Comment |
+  |-----|---------|
+  | **Porteur du projet** (rôle Admin, contourne le ruleset) | `git fetch origin && git checkout pre && git merge origin/main && git push origin pre` |
+  | **Session d'agent** (pas de contournement) | Branche `chore/sync-main-into-pre` depuis `pre`, y fusionner `origin/main`, PR vers `pre` |
+
+  Si le retour fait apparaître un conflit, ce n'est plus un retour mécanique : quelque chose a été
+  commité directement sur `main`. L'identifier avant de résoudre.
 - Avant d'ouvrir une PR : **re-synchroniser depuis `pre`** (`git merge origin/pre`) et résoudre les
   conflits chez soi, pas dans la PR.
 
@@ -164,10 +171,50 @@ pre           ← BRANCHE D'INTÉGRATION : toutes les sessions y convergent
 - **Avant de commencer, vérifier ce que font les autres sessions** : `git fetch origin --prune` puis
   `git branch -r`, et lire les PR ouvertes. Une décision déjà prise ailleurs ne se refait pas (§31.14
   du cahier des charges : Git conserve, les chats réfléchissent).
-- `main` et `pre` protégées : PR obligatoire, CI verte, au moins une revue, pas de force-push.
+- `main` et `pre` sont protégées par un ruleset GitHub — détail et conséquences en **§8 bis**.
 - Commits **atomiques et explicites** (Conventional Commits : `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`, `security:`).
 - Avant toute tâche importante : `git status` + `git diff`. Après : tests, `git diff`, commit.
 - **Ne jamais écraser le travail d'une autre branche/session.**
+
+---
+
+## 8 bis. Ruleset GitHub — ce qui bloquera concrètement une session
+
+`main` et `pre` sont couvertes par le ruleset **« Protection main & pre »** (`enforcement: active`).
+Vérifiable à tout moment, sans accès admin :
+
+```bash
+gh api repos/<owner>/<repo>/rules/branches/pre
+```
+
+| Règle | Effet pratique |
+|-------|----------------|
+| `pull_request` | PR obligatoire, **1 approbation**, plus une approbation supplémentaire pour les changements non attribués |
+| `required_status_checks` (politique **stricte**) | `lint, types, unit tests, build, e2e` doit être vert **et** la branche doit être à jour avec sa base avant de pouvoir être fusionnée |
+| `non_fast_forward` | pas de force-push |
+| `deletion` | `main` et `pre` ne peuvent pas être supprimées |
+
+### Ce que cela change pour une session d'agent
+
+1. **Une session ne fusionne pas.** Elle ouvre la PR, la vérifie, colle ses résultats de tests, et
+   **s'arrête là**. L'approbation est humaine : un agent ne peut pas approuver sa propre PR, et
+   l'approbation d'un agent n'est pas une revue.
+2. **La politique stricte rend la resynchronisation obligatoire, pas conseillée.** Chaque fusion dans
+   `pre` périme les autres PR ouvertes : il faut y refusionner `pre` avant qu'elles puissent partir.
+   Quand plusieurs sessions travaillent en parallèle, c'est la cause n°1 de friction — et c'est voulu.
+3. **Le rôle Admin contourne tout le ruleset** (`bypass_mode: always`). Le porteur du projet peut
+   donc pousser directement sur `main` et `pre`. Usage sanctionné : **le seul retour mécanique
+   `main` → `pre`** décrit au §8, qui n'apporte aucun contenu nouveau. Tout le reste passe par une PR,
+   y compris pour lui — sinon le ruleset ne protège plus rien.
+
+### Limites connues du ruleset, à corriger
+
+- ⚠️ **Seul le check `lint, types, unit tests, build, e2e` est obligatoire.** Ni
+  `no secret in git history` (Gitleaks) ni `relative links resolve` ne le sont. Une PR introduisant un
+  secret peut donc être fusionnée alors que ce check est rouge, ce qui contredit frontalement §5.1
+  (« Jamais de secret dans Git »). **À ajouter aux checks requis.**
+- Le contournement Admin est en `always` alors que GitHub propose un mode limité aux PR, plus étroit.
+  À resserrer si l'équipe grandit.
 
 ---
 
